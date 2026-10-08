@@ -1,0 +1,33 @@
+{
+  "name": "timo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "TIMO - Học mọi lúc, giỏi mọi nơi. Nền tảng giáo dục K12 Việt Nam.",
+  "packageManager": "pnpm@10.34.6",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev:web": "pnpm --filter @timo/web dev",
+    "dev:api": "pnpm --filter @timo/api dev",
+    "build": "pnpm -r --if-present run build",
+    "typecheck": "pnpm -r run typecheck",
+    "lint": "eslint .",
+    "test": "pnpm -r run test",
+    "format:check": "prettier --check .",
+    "db:generate": "pnpm --filter @timo/database run generate",
+    "check": "pnpm run typecheck && pnpm run lint && pnpm run test && pnpm run build",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@types/node": "^22.20.5",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^16.4.0",
+    "prettier": "^3.6.2",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.71.1"
+  }
+}

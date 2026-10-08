@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+/*
+ * TIMO design tokens.
+ * Màu thương hiệu: Primary #6258F5, Secondary #3B82F6, Accent #FF8747,
+ * Background #F8FAFF, Success #10B981.
+ * Mọi màu dùng trong giao diện phải đi qua token ở đây (không hardcode trong component).
+ */
+@theme {
+  --font-sans:
+    "Be Vietnam Pro", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans",
+    sans-serif;
+
+  --color-brand-50: #f1f0ff;
+  --color-brand-100: #e4e2ff;
+  --color-brand-200: #cbc7ff;
+  --color-brand-300: #a9a2ff;
+  --color-brand-400: #8a7eff;
+  --color-brand-500: #6258f5;
+  --color-brand-600: #5246e0;
+  --color-brand-700: #4236b8;
+  --color-brand-800: #362f92;
+  --color-brand-900: #2c2875;
+
+  --color-secondary-500: #3b82f6;
+  --color-secondary-600: #2563eb;
+  --color-accent-500: #ff8747;
+  --color-accent-600: #f06b25;
+  --color-success-500: #10b981;
+  --color-success-600: #059669;
+
+  --radius-card: 1.25rem;
+  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px -12px rgb(98 88 245 / 0.18);
+  --shadow-lift: 0 2px 4px rgb(15 23 42 / 0.05), 0 16px 40px -16px rgb(98 88 245 / 0.28);
+}
+
+/* Bảng màu ngữ nghĩa – đổi theo chủ đề sáng/tối. */
+:root {
+  --surface-page: #f8faff;
+  --surface-card: #ffffff;
+  --surface-muted: #f1f4fb;
+  --surface-inverse: #0f172a;
+  --text-strong: #0f172a;
+  --text-body: #334155;
+  --text-muted: #64748b;
+  --border-subtle: #e2e8f0;
+  --focus-ring: #6258f5;
+  --hero-from: #6258f5;
+  --hero-to: #3b82f6;
+}
+
+.dark {
+  --surface-page: #0b1020;
+  --surface-card: #131a2e;
+  --surface-muted: #1b2440;
+  --surface-inverse: #f8faff;
+  --text-strong: #f1f5f9;
+  --text-body: #cbd5e1;
+  --text-muted: #94a3b8;
+  --border-subtle: #26314f;
+  --focus-ring: #a9a2ff;
+  --hero-from: #3b35b8;
+  --hero-to: #1d4ed8;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background: var(--surface-page);
+    color: var(--text-body);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--text-strong);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  :focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+    border-radius: 0.5rem;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--color-brand-500) 25%, transparent);
+  }
+}
+
+@layer components {
+  .surface-card {
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-soft);
+  }
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--surface-muted) 25%,
+      var(--border-subtle) 50%,
+      var(--surface-muted) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tôn trọng người dùng yêu cầu giảm chuyển động. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

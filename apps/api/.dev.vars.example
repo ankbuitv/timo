@@ -1,0 +1,4 @@
+# Sao chép thành apps/api/.dev.vars (đã git ignore). KHÔNG commit file thật.
+SUPABASE_URL=https://<project-ref>.supabase.co
+SETUP_SECRET=<chuỗi-ngẫu-nhiên-ít-nhất-32-ký-tự>
+INITIAL_ADMIN_EMAIL=<email-quản-trị-viên-đầu-tiên>

@@ -1,0 +1,8 @@
+# Trang công khai được phép thu thập; khu vực quản trị và học tập riêng tư bị chặn.
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /tai-khoan
+Disallow: /khoi-tao-quan-tri
+Disallow: /dang-nhap

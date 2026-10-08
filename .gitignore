@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.wrangler/
+.dev.vars
+.env
+.env.local
+.env.*.local
+*.log
+coverage/
+playwright-report/
+test-results/
+.DS_Store
+.vite/
+# Giữ lại .env.example
+!.env.example
+backups/

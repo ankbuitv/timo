@@ -1,0 +1,89 @@
+{
+  // TIMO API – Cloudflare Worker (Hono).
+  // Biến không bí mật đặt trong "vars". Bí mật (SETUP_SECRET, ...) đặt bằng `wrangler secret put`.
+  // KHÔNG đặt khóa thật vào file này.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "timo-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+  },
+  "vars": {
+    "APP_ENV": "development",
+    "PUBLIC_APP_URL": "http://localhost:5173",
+    "SUPABASE_URL": "",
+    "ALLOWED_ORIGINS": "http://localhost:5173",
+    "INITIAL_ADMIN_EMAIL": "",
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "timo-main",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "../../packages/database/migrations",
+    },
+  ],
+  "ratelimits": [
+    {
+      "name": "SENSITIVE_RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": { "limit": 20, "period": 60 },
+    },
+  ],
+  "env": {
+    "staging": {
+      "name": "timo-api-staging",
+      "vars": {
+        "APP_ENV": "staging",
+        "PUBLIC_APP_URL": "https://staging.timovn.dpdns.org",
+        "SUPABASE_URL": "",
+        "ALLOWED_ORIGINS": "https://staging.timovn.dpdns.org",
+        "INITIAL_ADMIN_EMAIL": "",
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "timo-main-staging",
+          "database_id": "00000000-0000-0000-0000-000000000000",
+          "migrations_dir": "../../packages/database/migrations",
+        },
+      ],
+      "ratelimits": [
+        {
+          "name": "SENSITIVE_RATE_LIMITER",
+          "namespace_id": "1002",
+          "simple": { "limit": 20, "period": 60 },
+        },
+      ],
+    },
+    "production": {
+      "name": "timo-api",
+      "vars": {
+        "APP_ENV": "production",
+        "PUBLIC_APP_URL": "https://timovn.dpdns.org",
+        "SUPABASE_URL": "",
+        "ALLOWED_ORIGINS": "https://timovn.dpdns.org",
+        "INITIAL_ADMIN_EMAIL": "",
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "timo-main",
+          "database_id": "00000000-0000-0000-0000-000000000000",
+          "migrations_dir": "../../packages/database/migrations",
+        },
+      ],
+      "ratelimits": [
+        {
+          "name": "SENSITIVE_RATE_LIMITER",
+          "namespace_id": "1003",
+          "simple": { "limit": 20, "period": 60 },
+        },
+      ],
+    },
+  },
+}
