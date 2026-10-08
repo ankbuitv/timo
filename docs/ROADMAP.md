@@ -100,3 +100,11 @@ Trạng thái ghi theo **những gì đã kiểm chứng trong repo**, không th
 - Đã xong trong code (có test): fail-closed rate limit; cổng cấu hình; JWT chặt hơn; bootstrap xác minh email/khóa qua Supabase, atomic, có audit; manifest migration; migrate tách khỏi deploy; guard cấu hình đã đọc được `wrangler.jsonc`.
 - Chưa làm: tất cả việc cần tài khoản Cloudflare/Supabase/GitHub của chủ sở hữu (D1 id, secrets, environments, hostname). Xem `docs/PRE_DEPLOY_REVIEW.md` mục 3–6.
 - Chưa bắt đầu Phase 3 cho đến khi chủ sở hữu xác nhận rà soát.
+
+## Hạng mục B (2026-10-08) – đã làm trong mã, chưa xác minh với nhà cung cấp thật
+
+- Bộ nhận diện SVG gốc: biểu trưng mới (`apps/web/src/components/brand/TimoMark.tsx`), favicon, minh họa
+  học tập (`components/illustrations/LearningScene.tsx`) dùng trong hero.
+- Quản lý nhiều khóa Ollama: bảng `ai_api_keys` + `ai_usage_daily` (migration 0002), mã hóa AES-256-GCM,
+  allowlist chống SSRF, router failover có giới hạn, trang `/admin/ai`, 19 test API mới.
+- Chưa xác minh: gọi Ollama Cloud thật (cần API key của chủ sở hữu), kiểm thử giao diện trên trình duyệt.

@@ -107,6 +107,11 @@ export class FakeD1 {
     this.sqlite.exec(sql);
     return { count: 1, duration: 0 };
   }
+
+  /** CHỈ DÙNG TRONG KIỂM THỬ: đọc thẳng vài cột để chứng minh không lưu bản rõ. */
+  rawRowsForTest(sql: string, params: SQLInputValue[] = []): Row[] {
+    return this.sqlite.prepare(sql).all(...params) as Row[];
+  }
 }
 
 const here = dirname(fileURLToPath(import.meta.url));

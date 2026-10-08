@@ -1,3 +1,4 @@
 # SHA-256 của migration D1. KHÔNG sửa migration đã áp dụng; thêm file mới và chạy --write.
 7af2f2f74dff7c07cce0204a3902a1054f41f5094a0cfaf64ee8f017b3d8d31c  0000_init_schema.sql
 e544455be5f044d291e809e9b1f470dd3379bdd52bc1bbdffe18615a481e57c5  0001_seed_rbac_and_defaults.sql
+901394c9db85ef5cff0cba7ee8308b58f57b354f5ef3356f15d150d5b48f6121  0002_ai_keys.sql

@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from "react-router";
 import {
   BookMarked,
+  Bot,
   LayoutDashboard,
   LayoutTemplate,
   ScrollText,
@@ -24,6 +25,7 @@ export const ADMIN_LINKS: AdminLink[] = [
   { to: "/admin/lop-hoc", label: "Lớp học", icon: School, permission: "grades:view" },
   { to: "/admin/mon-hoc", label: "Môn học", icon: BookMarked, permission: "subjects:view" },
   { to: "/admin/cms", label: "Trang chủ (CMS)", icon: LayoutTemplate, permission: "cms:view" },
+  { to: "/admin/ai", label: "Khóa AI", icon: Bot, permission: "ai:manage" },
   { to: "/admin/nhat-ky", label: "Nhật ký", icon: ScrollText, permission: "audit:view" },
 ];
 

@@ -24,6 +24,8 @@ export const PERMISSIONS = [
   "cms:manage",
   "audit:view",
   "settings:manage",
+  /** Quản lý khóa API nhà cung cấp AI – CHỈ super_admin, không cấp cho admin. */
+  "ai:manage",
   "courses:view",
   "courses:create",
   "courses:update",
@@ -38,7 +40,9 @@ export type Permission = (typeof PERMISSIONS)[number];
 
 export const ROLE_PERMISSIONS: Record<SystemRole, readonly Permission[]> = {
   super_admin: PERMISSIONS,
-  admin: PERMISSIONS.filter((p) => p !== "roles:manage" && p !== "settings:manage"),
+  admin: PERMISSIONS.filter(
+    (p) => p !== "roles:manage" && p !== "settings:manage" && p !== "ai:manage",
+  ),
   moderator: ["courses:view", "content:moderate", "users:view", "grades:view", "subjects:view"],
   teacher: [
     "grades:view",

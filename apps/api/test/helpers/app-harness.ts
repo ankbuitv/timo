@@ -64,11 +64,18 @@ export async function createTestHarness() {
     SETUP_SECRET,
   };
 
+  /** Fetch gọi nhà cung cấp AI – mặc định là fetch thật, test có thể thay bằng setAiFetch(). */
+  let aiFetchImpl: typeof fetch | undefined;
   const app = createApp({
     verifier,
     supabaseFetch,
+    aiFetch: ((input: RequestInfo | URL, init?: RequestInit) =>
+      (aiFetchImpl ?? fetch)(input, init)) as typeof fetch,
     createDb: (e) => createDb(e),
   });
+  const setAiFetch = (fn?: typeof fetch) => {
+    aiFetchImpl = fn;
+  };
 
   async function makeUser(
     email: string,
@@ -111,6 +118,7 @@ export async function createTestHarness() {
     d1,
     request,
     makeUser,
+    setAiFetch,
     supabaseFetch,
     verifiedUser: (id: string, email: string): VerifiedUser => ({
       id,

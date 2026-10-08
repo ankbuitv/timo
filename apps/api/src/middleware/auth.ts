@@ -30,6 +30,8 @@ export type AppVariables = {
   auth?: AuthContext;
   verifier?: SupabaseJwtVerifier;
   supabaseFetch?: typeof fetch;
+  /** Ghi đè fetch gọi nhà cung cấp AI (dùng khi kiểm thử). */
+  aiFetch?: typeof fetch;
   requestId: string;
 };
 

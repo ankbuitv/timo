@@ -186,3 +186,71 @@ export const systemSettings = sqliteTable("system_settings", {
     .notNull()
     .default(sql`(unixepoch() * 1000)`),
 });
+
+/**
+ * Khóa API nhà cung cấp AI (Ollama Cloud).
+ *
+ * BẢO MẬT: cột `secretCiphertext` chỉ chứa bản mã AES-256-GCM. Khóa giải mã
+ * (`TIMO_AI_ENCRYPTION_KEY`) là Worker secret, KHÔNG nằm trong D1 và không bao giờ
+ * được trả về client. API chỉ trả về dạng che `••••••••XXXX`.
+ */
+export const aiApiKeys = sqliteTable(
+  "ai_api_keys",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    provider: text("provider", { enum: ["ollama"] })
+      .notNull()
+      .default("ollama"),
+    /** Bản mã base64 (bao gồm auth tag 16 byte của GCM). */
+    secretCiphertext: text("secret_ciphertext").notNull(),
+    /** IV 12 byte, base64. Mỗi lần mã hóa dùng IV mới. */
+    secretIv: text("secret_iv").notNull(),
+    /** 4 ký tự cuối của khóa gốc – chỉ để hiển thị, không đủ để suy ra khóa. */
+    secretLast4: text("secret_last4").notNull(),
+    /** SHA-256 rút gọn (16 hex) – phát hiện xoay khóa, không thể đảo ngược. */
+    secretFingerprint: text("secret_fingerprint").notNull(),
+    /** Base URL đã qua allowlist (mặc định https://ollama.com/api). */
+    baseUrl: text("base_url").notNull(),
+    /** Model ưu tiên cho khóa này; null = dùng model mặc định của hệ thống. */
+    model: text("model"),
+    /** Số nhỏ hơn được thử trước. */
+    priority: integer("priority").notNull().default(100),
+    isEnabled: integer("is_enabled", { mode: "boolean" }).notNull().default(true),
+    /** 0 = không giới hạn theo ngày (đếm theo ngày UTC). */
+    dailyRequestLimit: integer("daily_request_limit").notNull().default(0),
+    lastSuccessAt: integer("last_success_at", { mode: "number" }),
+    lastErrorAt: integer("last_error_at", { mode: "number" }),
+    /** Thông báo lỗi đã rút gọn; không chứa khóa. */
+    lastErrorMessage: text("last_error_message"),
+    lastCheckedAt: integer("last_checked_at", { mode: "number" }),
+    /** Danh sách model lấy từ GET /api/tags (tối đa 50 tên). */
+    availableModels: text("available_models", { mode: "json" }).$type<string[] | null>(),
+    createdBy: text("created_by").references(() => profiles.id, { onDelete: "set null" }),
+    ...timestamps,
+  },
+  (t) => [
+    index("ai_api_keys_enabled_priority_idx").on(t.isEnabled, t.priority),
+    check("ai_api_keys_priority_check", sql`${t.priority} >= 0 AND ${t.priority} <= 1000`),
+    check("ai_api_keys_daily_limit_check", sql`${t.dailyRequestLimit} >= 0`),
+  ],
+);
+
+/** Thống kê sử dụng theo khóa và theo ngày (UTC, dạng YYYY-MM-DD). */
+export const aiUsageDaily = sqliteTable(
+  "ai_usage_daily",
+  {
+    keyId: text("key_id")
+      .notNull()
+      .references(() => aiApiKeys.id, { onDelete: "cascade" }),
+    day: text("day").notNull(),
+    requests: integer("requests").notNull().default(0),
+    failures: integer("failures").notNull().default(0),
+    promptTokens: integer("prompt_tokens").notNull().default(0),
+    completionTokens: integer("completion_tokens").notNull().default(0),
+    updatedAt: integer("updated_at", { mode: "number" })
+      .notNull()
+      .default(sql`(unixepoch() * 1000)`),
+  },
+  (t) => [primaryKey({ columns: [t.keyId, t.day] }), index("ai_usage_daily_day_idx").on(t.day)],
+);

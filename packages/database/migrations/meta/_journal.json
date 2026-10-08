@@ -1,20 +1,27 @@
 {
-  "version": "7",
-  "dialect": "sqlite",
-  "entries": [
-    {
-      "idx": 0,
-      "version": "6",
-      "when": 1791464170335,
-      "tag": "0000_init_schema",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1791464173788,
-      "tag": "0001_seed_rbac_and_defaults",
-      "breakpoints": true
-    }
-  ]
+ "version": "7",
+ "dialect": "sqlite",
+ "entries": [
+  {
+   "idx": 0,
+   "version": "6",
+   "when": 1791464170335,
+   "tag": "0000_init_schema",
+   "breakpoints": true
+  },
+  {
+   "idx": 1,
+   "version": "6",
+   "when": 1791464173788,
+   "tag": "0001_seed_rbac_and_defaults",
+   "breakpoints": true
+  },
+  {
+   "idx": 2,
+   "version": "6",
+   "when": 1791464177000,
+   "tag": "0002_ai_keys",
+   "breakpoints": true
+  }
+ ]
 }

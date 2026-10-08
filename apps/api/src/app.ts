@@ -8,6 +8,7 @@ import { log } from "./lib/logger.js";
 import { corsForAllowedOrigins, originGuard, securityHeaders } from "./middleware/security.js";
 import type { AppBindings, AppVariables } from "./middleware/auth.js";
 import { adminRoutes } from "./routes/admin.js";
+import { adminAiRoutes } from "./routes/admin-ai.js";
 import { meRoutes } from "./routes/me.js";
 import { publicRoutes } from "./routes/public.js";
 import { setupRoutes } from "./routes/setup.js";
@@ -18,6 +19,8 @@ export interface AppOptions {
   verifier?: SupabaseJwtVerifier;
   /** Ghi đè fetch tới Supabase (dùng khi kiểm thử). */
   supabaseFetch?: typeof fetch;
+  /** Ghi đè fetch tới nhà cung cấp AI (dùng khi kiểm thử). */
+  aiFetch?: typeof fetch;
   /** Ghi đè cách tạo DB (dùng khi kiểm thử). */
   createDb?: (env: Env) => AppVariables["db"];
 }
@@ -33,6 +36,7 @@ export function createApp(options: AppOptions = {}) {
     c.set("db", (options.createDb ?? createDb)(c.env));
     if (options.verifier) c.set("verifier", options.verifier);
     if (options.supabaseFetch) c.set("supabaseFetch", options.supabaseFetch);
+    if (options.aiFetch) c.set("aiFetch", options.aiFetch);
     c.header("X-Request-Id", requestId);
     const started = Date.now();
     await next();
@@ -77,6 +81,7 @@ export function createApp(options: AppOptions = {}) {
   app.route("/api/me", meRoutes);
   app.route("/api/setup", setupRoutes);
   app.route("/api/admin", adminRoutes);
+  app.route("/api/admin/ai", adminAiRoutes);
 
   app.notFound((c) =>
     c.json({ error: { code: "not_found", message: "Đường dẫn không tồn tại" } }, 404),

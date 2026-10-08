@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "../ui";
 import { cn } from "../../lib/cn";
+import { LearningScene } from "../illustrations/LearningScene";
 
 interface Slide {
   title: string;
@@ -56,11 +57,19 @@ export function HeroCarousel({ slides }: { slides: Slide[] }) {
         aria-hidden="true"
       />
 
+      {/* Minh họa SVG gốc của TIMO – chỉ hiển thị từ màn hình lớn để không che nội dung. */}
+      <div
+        className="pointer-events-none absolute inset-y-6 right-6 hidden w-[42%] max-w-lg items-center lg:flex"
+        aria-hidden="true"
+      >
+        <LearningScene className="h-full w-full drop-shadow-2xl" />
+      </div>
+
       <div
         className="relative min-h-72 px-6 py-12 sm:px-12 sm:py-16 md:min-h-80"
         aria-live={paused ? "polite" : "off"}
       >
-        <div key={index} className="max-w-2xl animate-[toast-in_500ms_ease-out]">
+        <div key={index} className="max-w-2xl animate-[toast-in_500ms_ease-out] lg:max-w-[54%]">
           <p className="text-sm font-semibold text-white/80">
             Slide {index + 1} / {count}
           </p>

@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { config } from "../../lib/config";
 import { TIMO_BRAND } from "@timo/shared";
+import { TimoMark } from "../brand/TimoMark";
 
 export function SiteFooter() {
   const year = new Date().getFullYear();
@@ -8,7 +9,10 @@ export function SiteFooter() {
     <footer className="mt-16 border-t border-[var(--border-subtle)] bg-[var(--surface-card)] pb-24 md:pb-0">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-3">
         <div>
-          <p className="text-lg font-bold text-[var(--text-strong)]">TIMO</p>
+          <div className="flex items-center gap-2.5">
+            <TimoMark className="size-9 shrink-0" />
+            <p className="text-lg font-bold text-[var(--text-strong)]">TIMO</p>
+          </div>
           <p className="mt-1 text-sm text-[var(--text-muted)]">{TIMO_BRAND.sloganVi}</p>
           <p className="mt-3 text-xs text-[var(--text-muted)]">
             Nền tảng học tập K12 theo Chương trình GDPT 2018 – Kết nối tri thức với cuộc sống.

@@ -28,6 +28,7 @@ const GradesAdminPage = lazy(() => import("./pages/admin/GradesAdminPage"));
 const SubjectsAdminPage = lazy(() => import("./pages/admin/SubjectsAdminPage"));
 const CmsPage = lazy(() => import("./pages/admin/CmsPage"));
 const AuditPage = lazy(() => import("./pages/admin/AuditPage"));
+const AiKeysAdminPage = lazy(() => import("./pages/admin/AiKeysAdminPage"));
 
 function PublicLayout() {
   return (
@@ -142,6 +143,12 @@ export const router = createBrowserRouter([
           {
             element: <RequirePermission permission="cms:view" />,
             children: [{ path: "cms", element: <CmsPage />, errorElement: <RouteErrorPage /> }],
+          },
+          {
+            element: <RequirePermission permission="ai:manage" />,
+            children: [
+              { path: "ai", element: <AiKeysAdminPage />, errorElement: <RouteErrorPage /> },
+            ],
           },
           {
             element: <RequirePermission permission="audit:view" />,

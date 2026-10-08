@@ -6,3 +6,9 @@ SUPABASE_URL=https://<project-ref>.supabase.co
 SUPABASE_ANON_KEY=<khóa-anon-công-khai>
 SETUP_SECRET=<chuỗi-ngẫu-nhiên-ít-nhất-32-ký-tự>
 INITIAL_ADMIN_EMAIL=<email-quản-trị-viên-đầu-tiên>
+
+# Trợ lý AI (tùy chọn khi phát triển cục bộ). Trong staging/production PHẢI đặt bằng wrangler secret put.
+# Sinh khóa 32 byte ngẫu nhiên, ví dụ: openssl rand -base64 32
+TIMO_AI_ENCRYPTION_KEY=<32-byte-base64-hoặc-64-ký-tự-hex>
+# Danh sách host được phép cho endpoint AI (mặc định ollama.com).
+AI_ALLOWED_HOSTS=ollama.com

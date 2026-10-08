@@ -29,6 +29,22 @@
 | Chặn open-redirect sau đăng nhập (`next` chỉ là đường dẫn nội bộ)                                                                                               | `LoginPage`                                                   | Rà soát                                                        |
 | Cache-Control cho trang học tập/quản trị                                                                                                                        | `_headers` và API                                             | Cấu hình                                                       |
 
+## Khóa AI (Ollama) – đã triển khai
+
+| Biện pháp                                                                                    | Nơi thực hiện                     | Kiểm chứng                      |
+| -------------------------------------------------------------------------------------------- | --------------------------------- | ------------------------------- |
+| Khóa API mã hóa AES-256-GCM (IV ngẫu nhiên 12 byte) trước khi lưu D1                         | `apps/api/src/lib/ai-crypto.ts`   | Test roundtrip + sai khóa       |
+| Chỉ trả về dạng che `••••••••XXXX` + vân tay SHA-256 rút gọn; không có endpoint trả khóa gốc | `routes/admin-ai.ts`              | Test kiểm tra body và D1        |
+| Khóa mã hóa là Worker secret; thiếu → 503, không tự tạo/không hardcode                       | `lib/ai-router.ts`                | Test 503                        |
+| Chống SSRF endpoint: https, allowlist host, chặn IP/nội bộ/credential/path lạ                | `lib/ai-endpoint.ts`              | 3 test (12 URL bị từ chối)      |
+| Failover có giới hạn (1–5 lần), backoff nhân đôi tối đa 5s, không retry vô hạn               | `lib/ai-router.ts`                | Test chuyển khóa + số lần sleep |
+| 429 KHÔNG chuyển khóa để tránh vượt quota nhà cung cấp                                       | `lib/ai-router.ts`                | Test chỉ 1 lần gọi              |
+| Giới hạn theo ngày cho từng khóa; ghi usage theo ngày UTC                                    | `ai_usage_daily`                  | Test daily limit                |
+| Audit mọi thao tác (tạo/xoay/sửa/xóa/test/gửi thử), không ghi bí mật                         | `routes/admin-ai.ts`              | Test audit                      |
+| RBAC: `ai:manage` chỉ thuộc super_admin; API kiểm tra phía server                            | `@timo/shared`, `middleware/auth` | Test 403 cho học sinh           |
+
+Chi tiết đầy đủ: `docs/AI_KEYS.md`.
+
 ## Chưa triển khai (rủi ro còn lại)
 
 - **Phiên đã cấp vẫn hợp lệ đến khi hết hạn** khi tài khoản bị khóa trên Supabase; API chỉ chặn ngay khi hồ sơ local bị `suspended`/`deleted`. Xem docs/SUPABASE.md.
