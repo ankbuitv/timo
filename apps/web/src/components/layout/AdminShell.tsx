@@ -11,6 +11,7 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react";
+import type { Permission } from "@timo/shared";
 import { useAuth } from "../../lib/auth";
 import { cn } from "../../lib/cn";
 
@@ -18,7 +19,7 @@ interface AdminLink {
   to: string;
   label: string;
   icon: LucideIcon;
-  permission: string;
+  permission: Permission;
 }
 
 interface AdminGroup {
