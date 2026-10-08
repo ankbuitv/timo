@@ -12,5 +12,5 @@ export function AdminCard({
   children: ReactNode;
   className?: string;
 }) {
-  return <div className={`surface-card overflow-hidden ${className}`}>{children}</div>;
+  return <div className={`surface-panel ${className}`}>{children}</div>;
 }

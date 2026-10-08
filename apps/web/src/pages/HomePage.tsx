@@ -6,11 +6,18 @@ import { SubjectsSection } from "../components/home/SubjectsSection";
 import { FeaturesSection } from "../components/home/FeaturesSection";
 import { CtaSection } from "../components/home/CtaSection";
 import { FeaturedCoursesSection } from "../components/home/FeaturedCoursesSection";
+import { QuickStartSection, RoadmapSection } from "../components/home/Sections";
 import { usePublicHomepage, type HomepageSection } from "../lib/queries/catalog";
 import { usePageMeta } from "../lib/seo";
 import { TIMO_BRAND } from "@timo/shared";
 
-/** Trang chủ được điều khiển bởi CMS: thứ tự và nội dung khối lấy từ API. */
+/**
+ * Trang chủ được điều khiển bởi CMS: thứ tự và nội dung khối lấy từ API.
+ *
+ * Hai khối tĩnh được chèn vào theo vị trí cố định (không thuộc CMS):
+ * - "Đi tới nội dung bạn cần" ngay sau hero (lối vào nhanh tới các trang đã có).
+ * - "TIMO đang ở đâu trên lộ trình" ngay trước khối kêu gọi hành động.
+ */
 export function HomePage() {
   const { data, isPending, isError, refetch } = usePublicHomepage();
   usePageMeta({
@@ -33,79 +40,124 @@ export function HomePage() {
 }
 
 function HomeSections({ sections }: { sections: HomepageSection[] }) {
-  return (
-    <>
-      {sections.map((section) => {
-        switch (section.type) {
-          case "announcement":
-            return section.config.enabled ? (
-              <AnnouncementBar
-                key={section.key}
-                message={section.config.message}
-                tone={section.config.tone}
-              />
-            ) : null;
-          case "hero":
-            return (
-              <div key={section.key} className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 sm:pt-8">
-                <HeroCarousel slides={section.config.slides} />
-              </div>
-            );
-          case "grades":
-            return (
-              <div key={section.key} className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-                <GradeSection title={section.titleVi} groups={section.config.groups} />
-              </div>
-            );
-          case "featured_courses":
-            return (
-              <div key={section.key} className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-                <FeaturedCoursesSection title={section.titleVi} note={section.config.note} />
-              </div>
-            );
-          case "subjects":
-            return (
-              <div key={section.key} className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-                <SubjectsSection title={section.titleVi} limit={section.config.limit} />
-              </div>
-            );
-          case "features":
-            return (
-              <div key={section.key} className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-                <FeaturesSection title={section.titleVi} items={section.config.items} />
-              </div>
-            );
-          case "cta":
-            return (
-              <div key={section.key} className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-                <CtaSection
-                  title={section.titleVi}
-                  label={section.config.ctaLabel}
-                  href={section.config.ctaHref}
-                />
-              </div>
-            );
-          default:
-            return null;
-        }
-      })}
-    </>
-  );
+  const heroIndex = sections.findIndex((s) => s.type === "hero");
+  const ctaIndex = sections.findIndex((s) => s.type === "cta");
+  const quickStartAt = heroIndex >= 0 ? heroIndex + 1 : 0;
+  const roadmapAt = ctaIndex >= 0 ? ctaIndex : sections.length;
+
+  // Mỗi khối nội dung nằm trong một "dải" có nhịp dọc thống nhất; khối hero/announcement
+  // tràn viền nên được xử lý riêng.
+  const nodes: React.ReactNode[] = [];
+  sections.forEach((section, index) => {
+    if (index === quickStartAt) {
+      nodes.push(
+        <Shell key="static-quickstart">
+          <QuickStartSection />
+        </Shell>,
+      );
+    }
+    if (index === roadmapAt) {
+      nodes.push(
+        <Shell key="static-roadmap">
+          <RoadmapSection />
+        </Shell>,
+      );
+    }
+    nodes.push(<SectionNode key={section.key} section={section} />);
+  });
+  if (quickStartAt >= sections.length) {
+    nodes.push(
+      <Shell key="static-quickstart">
+        <QuickStartSection />
+      </Shell>,
+    );
+  }
+  if (roadmapAt >= sections.length) {
+    nodes.push(
+      <Shell key="static-roadmap">
+        <RoadmapSection />
+      </Shell>,
+    );
+  }
+
+  return <div className="section-stack">{nodes}</div>;
+}
+
+function Shell({ children }: { children: React.ReactNode }) {
+  return <div className="section-shell">{children}</div>;
+}
+
+function SectionNode({ section }: { section: HomepageSection }) {
+  switch (section.type) {
+    case "announcement":
+      return section.config.enabled ? (
+        <AnnouncementBar message={section.config.message} tone={section.config.tone} />
+      ) : null;
+    case "hero":
+      return (
+        <div className="section-shell pt-4 sm:pt-6">
+          <HeroCarousel slides={section.config.slides} />
+        </div>
+      );
+    case "grades":
+      return (
+        <Shell>
+          <GradeSection title={section.titleVi} groups={section.config.groups} />
+        </Shell>
+      );
+    case "featured_courses":
+      return (
+        <Shell>
+          <FeaturedCoursesSection title={section.titleVi} note={section.config.note} />
+        </Shell>
+      );
+    case "subjects":
+      return (
+        <Shell>
+          <SubjectsSection title={section.titleVi} limit={section.config.limit} />
+        </Shell>
+      );
+    case "features":
+      return (
+        <Shell>
+          <FeaturesSection title={section.titleVi} items={section.config.items} />
+        </Shell>
+      );
+    case "cta":
+      return (
+        <Shell>
+          <CtaSection
+            title={section.titleVi}
+            label={section.config.ctaLabel}
+            href={section.config.ctaHref}
+          />
+        </Shell>
+      );
+    default:
+      return null;
+  }
 }
 
 function HomeSkeleton() {
   return (
-    <div
-      className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6"
-      role="status"
-      aria-label="Đang tải trang chủ"
-    >
-      <Skeleton className="h-72 rounded-[2rem]" />
-      <Skeleton className="h-40" />
-      <div className="grid gap-3 sm:grid-cols-3">
-        <Skeleton className="h-24" />
-        <Skeleton className="h-24" />
-        <Skeleton className="h-24" />
+    <div className="section-stack" role="status" aria-label="Đang tải trang chủ">
+      <div className="section-shell pt-4">
+        <Skeleton className="h-80 rounded-[2rem]" />
+      </div>
+      <div className="section-shell grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className="h-36" />
+        ))}
+      </div>
+      <div className="section-shell grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <Skeleton key={i} className="h-32" />
+        ))}
+      </div>
+      <div className="section-shell grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <Skeleton key={i} className="h-40" />
+        ))}
       </div>
     </div>
   );

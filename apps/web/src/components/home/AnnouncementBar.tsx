@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Megaphone, X } from "lucide-react";
+import { Info, Megaphone, TriangleAlert, X } from "lucide-react";
 
 const DISMISS_KEY = "timo-announcement-dismissed";
 
@@ -19,15 +19,16 @@ export function AnnouncementBar({
     }
   });
   if (dismissed) return null;
-  const toneClass = {
-    info: "bg-brand-500 text-white",
-    success: "bg-success-600 text-white",
-    warning: "bg-accent-500 text-white",
+  const styles = {
+    info: { className: "bg-brand-500 text-white", Icon: Megaphone },
+    success: { className: "bg-success-600 text-white", Icon: Info },
+    warning: { className: "bg-accent-500 text-white", Icon: TriangleAlert },
   }[tone];
+  const { Icon } = styles;
   return (
-    <div role="region" aria-label="Thông báo" className={`${toneClass}`}>
+    <div role="region" aria-label="Thông báo" className={styles.className}>
       <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 text-sm font-medium sm:px-6">
-        <Megaphone className="size-4 shrink-0" aria-hidden="true" />
+        <Icon className="size-4 shrink-0" aria-hidden="true" />
         <p className="flex-1">{message}</p>
         <button
           type="button"

@@ -30,6 +30,7 @@ export default function AuditPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        eyebrow="Quản trị"
         title="Nhật ký hệ thống"
         description="Ghi lại các thay đổi quan trọng. Metadata đã được lọc, không chứa bí mật."
       />
@@ -41,32 +42,24 @@ export default function AuditPage() {
       {list.data && list.data.rows.length > 0 && (
         <AdminCard>
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="data-table">
               <caption className="sr-only">Nhật ký hệ thống</caption>
-              <thead className="bg-[var(--surface-muted)] text-xs uppercase tracking-wide text-[var(--text-muted)]">
+              <thead>
                 <tr>
-                  <th scope="col" className="px-4 py-3">
-                    Thời gian
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Hành động
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Đối tượng
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Người thực hiện
-                  </th>
+                  <th scope="col">Thời gian</th>
+                  <th scope="col">Hành động</th>
+                  <th scope="col">Đối tượng</th>
+                  <th scope="col">Người thực hiện</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--border-subtle)]">
+              <tbody>
                 {list.data.rows.map((r) => (
                   <tr key={r.id}>
                     <td className="whitespace-nowrap px-4 py-3">
                       {new Date(r.createdAt).toLocaleString("vi-VN")}
                     </td>
-                    <td className="px-4 py-3 font-mono text-xs">{r.action}</td>
-                    <td className="px-4 py-3">
+                    <td className="font-mono text-xs">{r.action}</td>
+                    <td>
                       {r.entityType}
                       {r.entityId ? (
                         <span className="text-[var(--text-muted)]">
@@ -75,9 +68,7 @@ export default function AuditPage() {
                         </span>
                       ) : null}
                     </td>
-                    <td className="px-4 py-3 font-mono text-xs">
-                      {r.actorId ? r.actorId.slice(0, 8) : "—"}
-                    </td>
+                    <td className="font-mono text-xs">{r.actorId ? r.actorId.slice(0, 8) : "—"}</td>
                   </tr>
                 ))}
               </tbody>

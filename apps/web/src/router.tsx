@@ -14,6 +14,7 @@ import { AdminShell } from "./components/layout/AdminShell";
 import { RequireAuth, LoadingPanel } from "./components/RequireAuth";
 import { RequirePermission } from "./components/RequirePermission";
 import { Button, Card } from "./components/ui";
+import { SubjectArt } from "./components/illustrations/SubjectArt";
 import { HomePage } from "./pages/HomePage";
 
 // Tách mã theo trang (code splitting): trang quản trị và đăng nhập chỉ tải khi cần.
@@ -70,20 +71,24 @@ function RouteErrorPage() {
   const error = useRouteError();
   const notFound = isRouteErrorResponse(error) && error.status === 404;
   return (
-    <div className="mx-auto max-w-xl px-4 py-20">
-      <Card className="text-center">
-        <p className="text-sm font-semibold text-brand-600 dark:text-brand-200">
-          {notFound ? "404" : "Lỗi"}
-        </p>
-        <h1 className="mt-2 text-2xl">{notFound ? "Không tìm thấy trang" : "Đã xảy ra lỗi"}</h1>
-        <p className="mt-2 text-sm text-[var(--text-muted)]">
+    <div className="mx-auto max-w-xl px-4 py-16 sm:py-20">
+      <Card className="space-y-4 text-center">
+        <span className="tone-soft mx-auto flex size-20 items-center justify-center rounded-3xl">
+          <SubjectArt artKey="book" hue={notFound ? 232 : 26} className="size-14" />
+        </span>
+        <p className="text-eyebrow">{notFound ? "Lỗi 404" : "Sự cố"}</p>
+        <h1>{notFound ? "Không tìm thấy trang" : "Đã xảy ra lỗi"}</h1>
+        <p className="text-sm text-[var(--text-muted)]">
           {notFound
             ? "Đường dẫn bạn truy cập không tồn tại hoặc đã được di chuyển."
             : "Hệ thống gặp sự cố ngoài dự kiến. Vui lòng tải lại trang."}
         </p>
-        <div className="mt-6 flex justify-center gap-2">
+        <div className="flex flex-wrap justify-center gap-2">
           <Link to="/">
             <Button>Về trang chủ</Button>
+          </Link>
+          <Link to="/#lop-hoc">
+            <Button variant="outline">Xem lớp học</Button>
           </Link>
         </div>
       </Card>

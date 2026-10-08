@@ -15,6 +15,7 @@ import {
   Badge,
   Button,
   Card,
+  DataTable,
   Dialog,
   EmptyState,
   ErrorState,
@@ -23,6 +24,7 @@ import {
   PageHeader,
   Select,
   Skeleton,
+  StatTile,
   Textarea,
 } from "../../components/ui";
 import { ConfirmDialog } from "../../components/admin/ConfirmDialog";
@@ -196,6 +198,7 @@ export default function AiKeysAdminPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        eyebrow="Quản trị"
         title="Khóa AI (Ollama Cloud)"
         description="Nhiều khóa dự phòng theo thứ tự ưu tiên. Khóa được mã hóa AES-256-GCM trong D1 và chỉ hiển thị dạng che."
         actions={
@@ -228,26 +231,31 @@ export default function AiKeysAdminPage() {
         )}
         {availability.data && (
           <>
-            <StatCard
+            <StatTile
               label="Khóa đang bật"
               value={`${availability.data.enabled}/${availability.data.total}`}
               hint="Bật/tắt từng khóa để kiểm soát chi phí"
+              hue={232}
             />
-            <StatCard
+            <StatTile
               label="Sẵn sàng"
               value={String(availability.data.counts.ok)}
               hint="Có lần thành công gần hơn lỗi gần nhất"
+              hue={168}
+              tone="success"
             />
-            <StatCard
+            <StatTile
               label="Đang lỗi"
               value={String(availability.data.counts.error)}
               hint="Lần gọi gần nhất thất bại"
+              hue={26}
               tone="danger"
             />
-            <StatCard
+            <StatTile
               label="Yêu cầu hôm nay"
               value={String(availability.data.requestsToday)}
               hint="Tổng theo tất cả khóa (UTC)"
+              hue={208}
             />
           </>
         )}
@@ -273,56 +281,40 @@ export default function AiKeysAdminPage() {
       )}
 
       {keys.data && keys.data.length > 0 && (
-        <AdminCard>
+        <DataTable>
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[960px] text-sm">
+            <table className="data-table min-w-[960px]">
               <caption className="sr-only">Danh sách khóa API Ollama Cloud</caption>
-              <thead className="bg-[var(--surface-muted)] text-left text-xs uppercase tracking-wide text-[var(--text-muted)]">
+              <thead>
                 <tr>
-                  <th scope="col" className="px-4 py-3">
-                    Tên / khóa
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Model
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Ưu tiên
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Giới hạn/ngày
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Hôm nay
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Trạng thái
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Lần cuối
-                  </th>
-                  <th scope="col" className="px-4 py-3 text-right">
+                  <th scope="col">Tên / khóa</th>
+                  <th scope="col">Model</th>
+                  <th scope="col">Ưu tiên</th>
+                  <th scope="col">Giới hạn/ngày</th>
+                  <th scope="col">Hôm nay</th>
+                  <th scope="col">Trạng thái</th>
+                  <th scope="col">Lần cuối</th>
+                  <th scope="col" className="text-right">
                     Thao tác
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--border-subtle)]">
+              <tbody>
                 {keys.data.map((k) => (
                   <tr key={k.id}>
-                    <td className="px-4 py-3">
+                    <td>
                       <div className="font-semibold text-[var(--text-strong)]">{k.name}</div>
                       <div className="font-mono text-xs text-[var(--text-muted)]">
                         {k.maskedKey}
                       </div>
                       <div className="text-xs text-[var(--text-muted)]">{k.baseUrl}</div>
                     </td>
-                    <td className="px-4 py-3">
+                    <td>
                       {k.model ?? <span className="text-[var(--text-muted)]">Theo mặc định</span>}
                     </td>
-                    <td className="px-4 py-3">{k.priority}</td>
-                    <td className="px-4 py-3">
-                      {k.dailyRequestLimit === 0 ? "Không giới hạn" : k.dailyRequestLimit}
-                    </td>
-                    <td className="px-4 py-3">
+                    <td>{k.priority}</td>
+                    <td>{k.dailyRequestLimit === 0 ? "Không giới hạn" : k.dailyRequestLimit}</td>
+                    <td>
                       {k.usageToday.requests} yêu cầu
                       {k.usageToday.failures > 0 && (
                         <span className="text-red-600 dark:text-red-400">
@@ -331,7 +323,7 @@ export default function AiKeysAdminPage() {
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3">
+                    <td>
                       {availabilityBadge(k)}
                       {k.lastErrorMessage && (
                         <div
@@ -342,12 +334,12 @@ export default function AiKeysAdminPage() {
                         </div>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-xs text-[var(--text-muted)]">
+                    <td className="text-xs text-[var(--text-muted)]">
                       <div>Thành công: {formatTime(k.lastSuccessAt)}</div>
                       <div>Lỗi: {formatTime(k.lastErrorAt)}</div>
                       <div>Kiểm tra: {formatTime(k.lastCheckedAt)}</div>
                     </td>
-                    <td className="px-4 py-3">
+                    <td>
                       <div className="flex flex-wrap justify-end gap-1.5">
                         <Button
                           size="sm"
@@ -387,7 +379,7 @@ export default function AiKeysAdminPage() {
               </tbody>
             </table>
           </div>
-        </AdminCard>
+        </DataTable>
       )}
 
       {keys.data?.some((k) => k.availableModels && k.availableModels.length > 0) && (
@@ -486,34 +478,6 @@ export default function AiKeysAdminPage() {
         onConfirm={() => toDelete && remove.mutate(toDelete)}
       />
     </div>
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  hint,
-  tone = "default",
-}: {
-  label: string;
-  value: string;
-  hint: string;
-  tone?: "default" | "danger";
-}) {
-  return (
-    <Card className="p-4">
-      <div className="text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">
-        {label}
-      </div>
-      <div
-        className={`mt-1 text-2xl font-bold ${
-          tone === "danger" ? "text-red-600 dark:text-red-400" : "text-[var(--text-strong)]"
-        }`}
-      >
-        {value}
-      </div>
-      <p className="mt-1 text-xs text-[var(--text-muted)]">{hint}</p>
-    </Card>
   );
 }
 

@@ -25,9 +25,9 @@ export function LearningScene({ className }: { className?: string }) {
       <ellipse cx="320" cy="250" rx="250" ry="170" fill="url(#ls-glow)" />
 
       {/* Bàn học */}
-      <rect x="70" y="330" width="500" height="16" rx="8" fill="#CBD5E1" />
-      <rect x="104" y="346" width="14" height="96" rx="7" fill="#94A3B8" />
-      <rect x="522" y="346" width="14" height="96" rx="7" fill="#94A3B8" />
+      <rect x="70" y="330" width="500" height="16" rx="8" fill="#E2E8F0" />
+      <rect x="104" y="346" width="14" height="96" rx="7" fill="#CBD5E1" />
+      <rect x="522" y="346" width="14" height="96" rx="7" fill="#CBD5E1" />
 
       {/* Máy tính bảng dựng đứng */}
       <rect x="300" y="150" width="260" height="176" rx="18" fill="#1E293B" />
@@ -71,7 +71,7 @@ export function LearningScene({ className }: { className?: string }) {
 
       {/* Hình khối kiến thức bay lên */}
       <g opacity="0.95">
-        <circle cx="150" cy="132" r="26" fill="#6258F5" />
+        <circle cx="150" cy="132" r="26" fill="#10B981" />
         <text
           x="150"
           y="141"
@@ -113,7 +113,7 @@ export function LearningScene({ className }: { className?: string }) {
         </text>
       </g>
       {/* Ngôi sao nhỏ */}
-      <path d="M118 208l7 15 16 2-12 11 3 16-14-8-14 8 3-16-12-11 16-2z" fill="#FBBF24" />
+      <path d="M112 228l7 15 16 2-12 11 3 16-14-8-14 8 3-16-12-11 16-2z" fill="#FBBF24" />
     </svg>
   );
 }

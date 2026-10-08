@@ -25,13 +25,26 @@ export function MobileTabBar() {
               to={href}
               className={({ isActive }) =>
                 cn(
-                  "flex min-h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold",
-                  isActive ? "text-brand-600 dark:text-brand-200" : "text-[var(--text-muted)]",
+                  "flex min-h-14 flex-col items-center justify-center gap-1 text-[11px] font-semibold transition-colors",
+                  isActive
+                    ? "text-brand-600 dark:text-brand-200"
+                    : "text-[var(--text-muted)] hover:text-[var(--text-body)]",
                 )
               }
             >
-              <Icon className="size-5" aria-hidden="true" />
-              {label}
+              {({ isActive }) => (
+                <>
+                  <span
+                    className={cn(
+                      "flex h-7 w-12 items-center justify-center rounded-full transition-colors",
+                      isActive ? "bg-brand-50 dark:bg-brand-900/60" : "bg-transparent",
+                    )}
+                  >
+                    <Icon className="size-5" aria-hidden="true" />
+                  </span>
+                  {label}
+                </>
+              )}
             </NavLink>
           </li>
         ))}

@@ -53,12 +53,38 @@ export default function BootstrapPage() {
     }
   }
 
+  const steps = [
+    {
+      title: "Tài khoản đã xác nhận email",
+      description: "Supabase phải xác nhận email của bạn trước khi cấp quyền quản trị.",
+    },
+    {
+      title: "Đúng email quản trị ban đầu",
+      description: "Email của bạn phải trùng INITIAL_ADMIN_EMAIL đã cấu hình cho môi trường.",
+    },
+    {
+      title: "Bí mật cài đặt từ người vận hành",
+      description: "SETUP_SECRET là Worker secret, tối thiểu 32 ký tự ngẫu nhiên.",
+    },
+  ];
   return (
-    <div className="mx-auto max-w-2xl space-y-6 px-4 py-8 sm:px-6 sm:py-10">
+    <div className="section-shell section-stack">
       <PageHeader
+        eyebrow="Thiết lập một lần"
         title="Khởi tạo quản trị viên"
         description="Thao tác một lần để cấp quyền Super Admin cho tài khoản được chỉ định."
       />
+      <ol className="grid gap-4 md:grid-cols-3">
+        {steps.map((step, i) => (
+          <li key={step.title} className="surface-card flex flex-col gap-2 p-5">
+            <span className="flex size-9 items-center justify-center rounded-xl bg-brand-50 text-sm font-extrabold text-brand-700 dark:bg-brand-900/60 dark:text-brand-100">
+              {i + 1}
+            </span>
+            <p className="font-bold text-[var(--text-strong)]">{step.title}</p>
+            <p className="text-sm text-[var(--text-muted)]">{step.description}</p>
+          </li>
+        ))}
+      </ol>
       {status.isPending && <Skeleton className="h-40" />}
       {status.isError && (
         <ErrorState
@@ -81,14 +107,17 @@ export default function BootstrapPage() {
             hành cung cấp.
           </p>
           <form className="space-y-4" onSubmit={submit}>
-            <Field label="Bí mật cài đặt (SETUP_SECRET)">
+            <Field
+              label="Bí mật cài đặt (SETUP_SECRET)"
+              hint="Tối thiểu 32 ký tự. Mọi lần thử đều được ghi vào nhật ký."
+            >
               {({ id, describedBy }) => (
                 <Input
                   id={id}
                   type="password"
                   autoComplete="off"
                   required
-                  minLength={16}
+                  minLength={32}
                   value={secret}
                   onChange={(e) => setSecret(e.target.value)}
                   aria-describedby={describedBy}

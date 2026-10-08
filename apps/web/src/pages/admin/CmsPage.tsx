@@ -86,6 +86,7 @@ export default function CmsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        eyebrow="Quản trị"
         title="Trang chủ (CMS)"
         description="Sắp xếp, bật/tắt và chỉnh nội dung các khối trang chủ. Cấu hình được kiểm tra nghiêm ngặt trước khi lưu."
       />

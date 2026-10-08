@@ -2,12 +2,16 @@ import { useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { BookOpenCheck, GraduationCap, ShieldCheck } from "lucide-react";
 import { Button, Card, Field, Input } from "../components/ui";
 import { getSupabase } from "../lib/supabase";
 import { useAuth } from "../lib/auth";
 import { AuthNotConfigured } from "../components/RequireAuth";
 import { usePageMeta } from "../lib/seo";
 import { config } from "../lib/config";
+import { TimoMark } from "../components/brand/TimoMark";
+import { ChalkArt } from "../components/illustrations/ChalkArt";
+import { LearningScene } from "../components/illustrations/LearningScene";
 
 type Mode = "signin" | "signup";
 type OAuthProvider = "google" | "facebook" | "azure";
@@ -89,26 +93,61 @@ export default function LoginPage() {
     if (err) setError(translateAuthError(err));
   }
 
+  const benefits = [
+    { icon: GraduationCap, text: "Theo dõi lớp học và môn học theo chương trình GDPT 2018" },
+    { icon: BookOpenCheck, text: "Tiến độ học tập được lưu theo tài khoản của bạn" },
+    { icon: ShieldCheck, text: "Một tài khoản dùng cho TIMO và Trung tâm hỗ trợ" },
+  ];
+
   return (
-    <div className="mx-auto grid max-w-5xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-2 md:py-16">
-      <div className="space-y-4">
-        <p className="text-sm font-semibold text-brand-600 dark:text-brand-200">
-          Học mọi lúc, giỏi mọi nơi
-        </p>
-        <h1 className="text-3xl sm:text-4xl">
+    <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[1.05fr_minmax(0,26rem)] lg:gap-12">
+      {/* Cột giới thiệu: nền gradient thương hiệu + minh họa gốc. */}
+      <section
+        aria-labelledby="auth-intro"
+        className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[var(--hero-from)] to-[var(--hero-to)] px-6 py-8 text-white shadow-lift sm:px-10 sm:py-12"
+      >
+        <div
+          className="pointer-events-none absolute -right-20 -top-24 size-72 rounded-full bg-accent-500/30 blur-3xl"
+          aria-hidden="true"
+        />
+        <div className="relative flex items-center gap-3">
+          <TimoMark className="size-10 shrink-0" title="Biểu trưng TIMO" />
+          <div>
+            <p className="text-lg font-extrabold leading-none">TIMO</p>
+            <p className="mt-1 text-xs font-semibold text-white/80">Học mọi lúc, giỏi mọi nơi</p>
+          </div>
+        </div>
+
+        <h1 id="auth-intro" className="text-h1 mt-8 text-white text-balance-tight">
           {mode === "signin" ? "Chào mừng trở lại" : "Tạo tài khoản TIMO"}
         </h1>
-        <p className="text-sm text-[var(--text-muted)]">
-          Tài khoản dùng chung cho TIMO và Trung tâm hỗ trợ. Trẻ dưới 16 tuổi nên đăng ký cùng phụ
-          huynh.
+        <p className="mt-3 max-w-md text-sm leading-relaxed text-white/85">
+          Đăng nhập để xem lớp học, môn học và tiến độ của bạn. Trẻ dưới 16 tuổi nên đăng ký cùng
+          phụ huynh.
         </p>
-      </div>
 
-      <Card className="space-y-5">
+        <ul className="mt-8 space-y-3 text-sm">
+          {benefits.map(({ icon: Icon, text }) => (
+            <li key={text} className="flex items-start gap-3">
+              <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-xl bg-white/15">
+                <Icon className="size-4" aria-hidden="true" />
+              </span>
+              <span className="text-white/90">{text}</span>
+            </li>
+          ))}
+        </ul>
+
+        <div className="relative mt-10 hidden lg:block">
+          <LearningScene className="float-slow mx-auto w-full max-w-sm drop-shadow-2xl" />
+        </div>
+      </section>
+
+      {/* Cột biểu mẫu. */}
+      <Card className="space-y-5 self-start p-6 sm:p-7">
         <div
           role="tablist"
           aria-label="Chế độ"
-          className="grid grid-cols-2 rounded-xl bg-[var(--surface-muted)] p-1"
+          className="grid grid-cols-2 rounded-2xl bg-[var(--surface-muted)] p-1"
         >
           {(["signin", "signup"] as const).map((m) => (
             <button
@@ -117,7 +156,11 @@ export default function LoginPage() {
               type="button"
               aria-selected={mode === m}
               onClick={() => setMode(m)}
-              className={`h-9 rounded-lg text-sm font-semibold ${mode === m ? "bg-[var(--surface-card)] text-brand-600 shadow-soft dark:text-brand-200" : "text-[var(--text-muted)]"}`}
+              className={`h-10 rounded-xl text-sm font-bold transition-colors ${
+                mode === m
+                  ? "bg-[var(--surface-card)] text-brand-700 shadow-soft dark:text-brand-100"
+                  : "text-[var(--text-muted)] hover:text-[var(--text-body)]"
+              }`}
             >
               {m === "signin" ? "Đăng nhập" : "Đăng ký"}
             </button>
@@ -132,6 +175,7 @@ export default function LoginPage() {
                 type="email"
                 autoComplete="email"
                 required
+                placeholder="ten@vidu.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 aria-describedby={describedBy}
@@ -168,7 +212,7 @@ export default function LoginPage() {
         </form>
 
         <div className="relative py-1 text-center text-xs text-[var(--text-muted)]">
-          <span className="bg-[var(--surface-card)] px-2 relative z-10">hoặc tiếp tục với</span>
+          <span className="relative z-10 bg-[var(--surface-card)] px-2">hoặc tiếp tục với</span>
           <span
             className="absolute inset-x-0 top-1/2 h-px bg-[var(--border-subtle)]"
             aria-hidden="true"
@@ -186,10 +230,15 @@ export default function LoginPage() {
             </Button>
           ))}
         </div>
-        <p className="text-xs text-[var(--text-muted)]">
-          Đăng nhập bằng mạng xã hội chỉ hoạt động khi nhà cung cấp đã được bật trong Supabase (xem
-          docs/SUPABASE.md).
-        </p>
+        <div className="flex items-start gap-3 rounded-2xl bg-[var(--surface-muted)] p-3 text-xs text-[var(--text-muted)]">
+          <div className="w-16 shrink-0">
+            <ChalkArt artKey="book" board={false} className="w-full" />
+          </div>
+          <p>
+            Đăng nhập bằng mạng xã hội chỉ hoạt động khi nhà cung cấp đã được bật trong Supabase
+            (xem <code>docs/SUPABASE.md</code>).
+          </p>
+        </div>
         <p className="text-center text-sm">
           <Link to="/" className="font-semibold text-brand-600 dark:text-brand-200">
             ← Về trang chủ

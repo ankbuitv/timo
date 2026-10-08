@@ -35,6 +35,7 @@ export default function UsersPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        eyebrow="Quản trị"
         title="Người dùng"
         description="Danh sách hồ sơ được tạo khi người dùng đăng nhập lần đầu."
       />
@@ -74,37 +75,27 @@ export default function UsersPage() {
       {list.data && list.data.rows.length > 0 && (
         <AdminCard>
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="data-table">
               <caption className="sr-only">Danh sách người dùng</caption>
-              <thead className="bg-[var(--surface-muted)] text-xs uppercase tracking-wide text-[var(--text-muted)]">
+              <thead>
                 <tr>
-                  <th scope="col" className="px-4 py-3">
-                    Tên
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Email
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Trạng thái
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Tham gia
-                  </th>
+                  <th scope="col">Tên</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Trạng thái</th>
+                  <th scope="col">Tham gia</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--border-subtle)]">
+              <tbody>
                 {list.data.rows.map((u) => (
                   <tr key={u.id}>
-                    <td className="px-4 py-3 font-semibold text-[var(--text-strong)]">
-                      {u.displayName}
-                    </td>
-                    <td className="px-4 py-3 break-all">{u.email}</td>
-                    <td className="px-4 py-3">
+                    <td className="font-semibold text-[var(--text-strong)]">{u.displayName}</td>
+                    <td className="break-all">{u.email}</td>
+                    <td>
                       <Badge tone={u.status === "active" ? "success" : "danger"}>
                         {STATUS_LABEL[u.status]}
                       </Badge>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    <td className="whitespace-nowrap">
                       {new Date(u.createdAt).toLocaleDateString("vi-VN")}
                     </td>
                   </tr>

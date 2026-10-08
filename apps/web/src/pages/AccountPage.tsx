@@ -28,6 +28,7 @@ export default function AccountPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6 px-4 py-8 sm:px-6 sm:py-10">
       <PageHeader
+        eyebrow="Hồ sơ"
         title="Tài khoản của tôi"
         description="Thông tin hồ sơ và quyền truy cập hiện tại."
       />
@@ -40,7 +41,20 @@ export default function AccountPage() {
       )}
       {me.data && (
         <>
-          <Card className="space-y-4">
+          <Card className="space-y-6">
+            <div className="flex items-center gap-4">
+              <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-secondary-500 text-xl font-extrabold text-white shadow-soft">
+                {(me.data.displayName || me.data.email || "T").slice(0, 1).toUpperCase()}
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-lg font-extrabold text-[var(--text-strong)]">
+                  {me.data.displayName}
+                </p>
+                <p className="truncate text-sm text-[var(--text-muted)]">
+                  {me.data.email ?? "Chưa có email"}
+                </p>
+              </div>
+            </div>
             <dl className="grid gap-4 sm:grid-cols-2">
               <div>
                 <dt className="text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">
@@ -84,7 +98,10 @@ export default function AccountPage() {
                   Quản lý người dùng, lớp học, môn học và trang chủ.
                 </p>
               </div>
-              <Link to="/admin" className="font-semibold text-brand-600 dark:text-brand-200">
+              <Link
+                to="/admin"
+                className="inline-flex h-10 items-center rounded-xl bg-brand-500 px-4 text-sm font-semibold text-white hover:bg-brand-600"
+              >
                 Mở quản trị →
               </Link>
             </Card>

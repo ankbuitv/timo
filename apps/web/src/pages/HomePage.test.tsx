@@ -68,10 +68,13 @@ describe("HomePage (CMS-driven)", () => {
 
     const grades = await screen.findByRole("heading", { name: "Chọn lớp học" });
     expect(grades).toBeInTheDocument();
-    const lop1 = await screen.findByRole("link", { name: /Lớp 1/ });
+    // Thẻ lớp có nhãn truy cập riêng nên dò chính xác được từng lớp.
+    const lop1 = await screen.findByRole("link", { name: "Lớp 1 – xem môn học và nội dung" });
     expect(lop1).toHaveAttribute("href", "/lop/lop-1");
     // Lớp 6 thuộc nhóm THCS, không có trong nhóm "primary" của CMS.
-    expect(screen.queryByRole("link", { name: /Lớp 6/ })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Lớp 6 – xem môn học và nội dung" })).toBeNull();
+    // Khối tĩnh "đi tới nội dung bạn cần" luôn có mặt và chỉ trỏ tới đường dẫn đã tồn tại.
+    expect(screen.getByRole("heading", { name: "Đi tới nội dung bạn cần" })).toBeInTheDocument();
 
     const featureList = screen.getByRole("heading", { name: "Lợi ích" }).parentElement!;
     expect(within(featureList).getByText("Học theo tốc độ")).toBeInTheDocument();

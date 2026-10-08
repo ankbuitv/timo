@@ -8,16 +8,16 @@ Trạng thái ghi theo **những gì đã kiểm chứng trong repo**, không th
 
 ## Giai đoạn 1 – Nền tảng
 
-| Hạng mục                                              | Trạng thái | Chi tiết                                                                                                                                    |
-| ----------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Monorepo pnpm + TypeScript strict + ESLint + Prettier | ✅         | `pnpm run check`                                                                                                                            |
-| Cấu trúc `apps/`, `packages/`                         | 🟡         | Có `web`, `api`, `shared`, `validation`, `auth`, `database`. Chưa có `packages/ui`, `packages/config`, `apps/support`                       |
-| Design system (token màu TIMO, sáng/tối/hệ thống)     | 🟡         | Token CSS + thành phần cơ bản trong `apps/web`. Chưa dùng shadcn/ui CLI, chưa dùng Motion (dùng CSS transitions + `prefers-reduced-motion`) |
-| Schema D1 + migration                                 | 🟡         | 10 bảng nền tảng. Các bảng nghiệp vụ còn lại chưa có                                                                                        |
-| Xác thực Supabase                                     | 🟡         | Xác minh JWT + UI đăng nhập/đăng ký/OAuth đã có. **Chưa kiểm thử với project Supabase thật**                                                |
-| RBAC server-side                                      | ✅         | 7 vai trò, 19 quyền, kiểm thử 403                                                                                                           |
-| Khởi tạo quản trị một lần                             | ✅         | Có kiểm thử: sai secret, sai email, gọi lần 2 → 409                                                                                         |
-| Triển khai (Wrangler, CI, deploy có cổng)             | 🟡         | Cấu hình + workflow hoàn chỉnh; **chưa deploy**, chưa có `database_id` thật                                                                 |
+| Hạng mục                                              | Trạng thái | Chi tiết                                                                                                                                                                                            |
+| ----------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Monorepo pnpm + TypeScript strict + ESLint + Prettier | ✅         | `pnpm run check`                                                                                                                                                                                    |
+| Cấu trúc `apps/`, `packages/`                         | 🟡         | Có `web`, `api`, `shared`, `validation`, `auth`, `database`. Chưa có `packages/ui`, `packages/config`, `apps/support`                                                                               |
+| Design system (token màu TIMO, sáng/tối/hệ thống)     | ✅         | Token + thang chữ + hệ "tone" theo môn/lớp; 18 minh họa SVG gốc, hai phong cách; tài liệu `docs/DESIGN_SYSTEM.md`. Không dùng shadcn/ui CLI hay Motion (CSS transitions + `prefers-reduced-motion`) |
+| Schema D1 + migration                                 | 🟡         | 10 bảng nền tảng. Các bảng nghiệp vụ còn lại chưa có                                                                                                                                                |
+| Xác thực Supabase                                     | 🟡         | Xác minh JWT + UI đăng nhập/đăng ký/OAuth đã có. **Chưa kiểm thử với project Supabase thật**                                                                                                        |
+| RBAC server-side                                      | ✅         | 7 vai trò, 19 quyền, kiểm thử 403                                                                                                                                                                   |
+| Khởi tạo quản trị một lần                             | ✅         | Có kiểm thử: sai secret, sai email, gọi lần 2 → 409                                                                                                                                                 |
+| Triển khai (Wrangler, CI, deploy có cổng)             | 🟡         | Cấu hình + workflow hoàn chỉnh; **chưa deploy**, chưa có `database_id` thật                                                                                                                         |
 
 ## Giai đoạn 2 – Trang chủ, CMS nền, lớp và môn
 
@@ -108,3 +108,12 @@ Trạng thái ghi theo **những gì đã kiểm chứng trong repo**, không th
 - Quản lý nhiều khóa Ollama: bảng `ai_api_keys` + `ai_usage_daily` (migration 0002), mã hóa AES-256-GCM,
   allowlist chống SSRF, router failover có giới hạn, trang `/admin/ai`, 19 test API mới.
 - Chưa xác minh: gọi Ollama Cloud thật (cần API key của chủ sở hữu), kiểm thử giao diện trên trình duyệt.
+
+## Rà soát thiết kế toàn giao diện (2026-10-08)
+
+- Trang chủ, trang lớp, giới thiệu, đăng nhập, tài khoản, khởi tạo quản trị: thiết kế lại.
+- Quản trị: khung sidebar/nhóm menu, bảng dữ liệu dùng chung, bảng điều khiển có lối tắt;
+  các trang danh mục (lớp, môn, người dùng, nhật ký, CMS) đồng bộ theo design system.
+- Bộ minh họa: `apps/web/src/lib/visuals.ts` + `SubjectArt` (flat có chiều sâu) + `ChalkArt` (phấn).
+- Đã xem bằng cách rasterize: 18 minh họa ở cả hai phong cách, biểu trưng ở 5 kích cỡ, minh họa hero.
+- **Chưa** kiểm tra giao diện trong trình duyệt thật (sandbox không có Chromium) – xem checklist.

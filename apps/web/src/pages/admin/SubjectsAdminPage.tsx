@@ -64,6 +64,7 @@ export default function SubjectsAdminPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        eyebrow="Quản trị"
         title="Môn học"
         description="Môn học chuẩn và môn tùy chỉnh do quản trị viên thêm."
         actions={

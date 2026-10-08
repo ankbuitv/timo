@@ -13,6 +13,9 @@ export const config = {
   appUrl: clean(import.meta.env.VITE_PUBLIC_APP_URL, "http://localhost:5173"),
   supportUrl: clean(import.meta.env.VITE_PUBLIC_SUPPORT_URL),
   statusUrl: clean(import.meta.env.VITE_PUBLIC_STATUS_URL),
+  /** Liên kết mã nguồn (tùy chọn) và email hỗ trợ (tùy chọn) – cấu hình qua env, không hardcode. */
+  repositoryUrl: clean(import.meta.env.VITE_PUBLIC_REPOSITORY_URL),
+  supportEmail: (import.meta.env.VITE_PUBLIC_SUPPORT_EMAIL ?? "").trim(),
   appEnv: import.meta.env.VITE_APP_ENV ?? "development",
 } as const;
 

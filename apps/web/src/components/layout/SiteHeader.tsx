@@ -30,7 +30,7 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--border-subtle)] bg-[color-mix(in_oklab,var(--surface-card)_85%,transparent)] backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
+      <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:h-[4.5rem] sm:gap-4 sm:px-6">
         <TimoLogo />
 
         <nav aria-label="Điều hướng chính" className="ml-4 hidden min-w-0 flex-1 xl:block">
@@ -42,10 +42,10 @@ export function SiteHeader() {
                     to={item.href}
                     className={({ isActive }) =>
                       cn(
-                        "rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--text-strong)]",
+                        "rounded-xl px-3 py-2 text-sm font-semibold transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--text-strong)]",
                         isActive ||
                           (item.href === "/thong-tin" && location.pathname === "/thong-tin")
-                          ? "text-brand-600 dark:text-brand-200"
+                          ? "bg-brand-50 text-brand-700 dark:bg-brand-900/50 dark:text-brand-100"
                           : "text-[var(--text-body)]",
                       )
                     }
@@ -55,7 +55,7 @@ export function SiteHeader() {
                 ) : (
                   <span
                     aria-disabled="true"
-                    className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-[var(--text-muted)]"
+                    className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium text-[var(--text-muted)]"
                   >
                     {item.label}
                     <Badge>Sắp ra mắt</Badge>
@@ -99,7 +99,7 @@ export function SiteHeader() {
           ) : (
             <Link
               to="/dang-nhap"
-              className="hidden items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-soft transition-colors hover:bg-brand-600 md:inline-flex"
+              className="hidden items-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition-colors hover:bg-brand-600 md:inline-flex"
             >
               <LogIn className="size-4" aria-hidden="true" />
               Đăng nhập
@@ -125,8 +125,9 @@ export function SiteHeader() {
       {open && (
         <div
           id="mobile-menu"
-          className="border-t border-[var(--border-subtle)] bg-[var(--surface-card)] px-4 pb-6 pt-3 xl:hidden"
+          className="border-t border-[var(--border-subtle)] bg-[var(--surface-card)] px-4 pb-6 pt-4 xl:hidden"
         >
+          <p className="text-eyebrow mb-3">Điều hướng</p>
           <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {PUBLIC_NAV.map((item) => {
               const Icon = item.icon;
@@ -136,17 +137,23 @@ export function SiteHeader() {
                     <Link
                       to={item.href}
                       onClick={() => setOpen(false)}
-                      className="flex items-center gap-2.5 rounded-xl border border-[var(--border-subtle)] p-3 text-sm font-semibold text-[var(--text-strong)] hover:bg-[var(--surface-muted)]"
+                      className="flex min-h-14 items-center gap-2.5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-card)] p-3 text-sm font-semibold text-[var(--text-strong)] hover:border-brand-300 hover:bg-[var(--surface-muted)]"
                     >
-                      <Icon className="size-5 text-brand-500" aria-hidden="true" />
+                      <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/50 dark:text-brand-100">
+                        <Icon className="size-4.5" aria-hidden="true" />
+                      </span>
                       {item.label}
                     </Link>
                   ) : (
-                    <span className="flex items-center gap-2.5 rounded-xl border border-dashed border-[var(--border-subtle)] p-3 text-sm text-[var(--text-muted)]">
-                      <Icon className="size-5" aria-hidden="true" />
+                    <span className="flex min-h-14 items-center gap-2.5 rounded-2xl border border-dashed border-[var(--border-subtle)] p-3 text-sm text-[var(--text-muted)]">
+                      <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[var(--surface-muted)]">
+                        <Icon className="size-4.5" aria-hidden="true" />
+                      </span>
                       <span className="flex flex-col">
                         {item.label}
-                        <span className="text-[11px]">Sắp ra mắt</span>
+                        <span className="text-[11px] font-bold uppercase tracking-wide">
+                          Sắp ra mắt
+                        </span>
                       </span>
                     </span>
                   )}
@@ -154,7 +161,7 @@ export function SiteHeader() {
               );
             })}
           </ul>
-          <div className="mt-4">
+          <div className="mt-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-muted)] p-4">
             {session && user ? (
               <div className="flex items-center justify-between gap-2">
                 <Link
@@ -176,9 +183,10 @@ export function SiteHeader() {
               <Link
                 to="/dang-nhap"
                 onClick={() => setOpen(false)}
-                className="font-semibold text-brand-600 dark:text-brand-200"
+                className="flex items-center justify-between gap-2 font-semibold text-brand-700 dark:text-brand-100"
               >
-                Đăng nhập / Đăng ký →
+                Đăng nhập / Đăng ký
+                <LogIn className="size-4" aria-hidden="true" />
               </Link>
             )}
           </div>

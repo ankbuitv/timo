@@ -1,15 +1,18 @@
 @import "tailwindcss";
 
 /*
- * TIMO design tokens.
+ * TIMO Design System – tokens.
  * Màu thương hiệu: Primary #6258F5, Secondary #3B82F6, Accent #FF8747,
  * Background #F8FAFF, Success #10B981.
- * Mọi màu dùng trong giao diện phải đi qua token ở đây (không hardcode trong component).
+ *
+ * Quy tắc: mọi màu trong giao diện phải đi qua token ở đây hoặc hệ "tone" bên dưới
+ * (biến --tone-hue đặt theo từng môn học / khối lớp). Không hardcode màu trong component.
  */
 @theme {
   --font-sans:
     "Be Vietnam Pro", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans",
     sans-serif;
+  --font-chalk: "Be Vietnam Pro", ui-rounded, "Segoe UI", system-ui, sans-serif;
 
   --color-brand-50: #f1f0ff;
   --color-brand-100: #e4e2ff;
@@ -29,9 +32,29 @@
   --color-success-500: #10b981;
   --color-success-600: #059669;
 
+  /* Bảng xanh cho hình minh họa kiểu phấn (chalk). */
+  --color-board-700: #1f3b36;
+  --color-board-800: #16302c;
+  --color-board-900: #0e2421;
+  --color-chalk: #f4fbf7;
+
   --radius-card: 1.25rem;
+  --radius-pill: 999px;
+
   --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px -12px rgb(98 88 245 / 0.18);
   --shadow-lift: 0 2px 4px rgb(15 23 42 / 0.05), 0 16px 40px -16px rgb(98 88 245 / 0.28);
+  --shadow-tile: 0 1px 1px rgb(15 23 42 / 0.04), 0 10px 22px -14px rgb(15 23 42 / 0.35);
+  --shadow-inset-top: inset 0 1px 0 rgb(255 255 255 / 0.65);
+
+  /* Thang chữ co giãn theo màn hình. */
+  --text-display: clamp(2.1rem, 1.35rem + 3.4vw, 3.6rem);
+  --text-display--line-height: 1.06;
+  --text-h1: clamp(1.75rem, 1.3rem + 1.9vw, 2.6rem);
+  --text-h1--line-height: 1.15;
+  --text-h2: clamp(1.35rem, 1.15rem + 0.9vw, 1.85rem);
+  --text-h2--line-height: 1.2;
+  --text-h3: clamp(1.1rem, 1rem + 0.4vw, 1.3rem);
+  --text-eyebrow: 0.78rem;
 }
 
 /* Bảng màu ngữ nghĩa – đổi theo chủ đề sáng/tối. */
@@ -39,25 +62,33 @@
   --surface-page: #f8faff;
   --surface-card: #ffffff;
   --surface-muted: #f1f4fb;
+  --surface-sunken: #eef2fb;
   --surface-inverse: #0f172a;
   --text-strong: #0f172a;
   --text-body: #334155;
   --text-muted: #64748b;
   --border-subtle: #e2e8f0;
+  --border-strong: #cbd5e1;
   --focus-ring: #6258f5;
   --hero-from: #6258f5;
   --hero-to: #3b82f6;
+
+  /* Sắc độ mặc định khi một khối chưa có tone riêng. */
+  --tone-hue: 245;
+  --tone-sat: 92%;
 }
 
 .dark {
   --surface-page: #0b1020;
   --surface-card: #131a2e;
   --surface-muted: #1b2440;
+  --surface-sunken: #101830;
   --surface-inverse: #f8faff;
   --text-strong: #f1f5f9;
   --text-body: #cbd5e1;
   --text-muted: #94a3b8;
   --border-subtle: #26314f;
+  --border-strong: #334155;
   --focus-ring: #a9a2ff;
   --hero-from: #3b35b8;
   --hero-to: #1d4ed8;
@@ -67,6 +98,7 @@
   html {
     -webkit-text-size-adjust: 100%;
     text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
   }
   body {
     background: var(--surface-page);
@@ -81,8 +113,20 @@
   h4 {
     color: var(--text-strong);
     font-weight: 700;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
     text-wrap: balance;
+  }
+  h1 {
+    font-size: var(--text-h1);
+    line-height: 1.15;
+  }
+  h2 {
+    font-size: var(--text-h2);
+    line-height: 1.2;
+  }
+  h3 {
+    font-size: var(--text-h3);
+    line-height: 1.3;
   }
   :focus-visible {
     outline: 3px solid var(--focus-ring);
@@ -95,12 +139,171 @@
 }
 
 @layer components {
+  /* ---------- Khối nội dung ---------- */
   .surface-card {
     background: var(--surface-card);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-soft);
   }
+  .surface-panel {
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+  }
+  .surface-sunken {
+    background: var(--surface-sunken);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-card);
+  }
+
+  /* Thẻ có tương tác: nâng nhẹ + viền tone khi hover/focus. */
+  .card-interactive {
+    transition:
+      transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 220ms ease,
+      border-color 220ms ease;
+  }
+  .card-interactive:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lift);
+    border-color: hsl(var(--tone-hue) var(--tone-sat) 78%);
+  }
+  .dark .card-interactive:hover {
+    border-color: hsl(var(--tone-hue) 55% 42%);
+  }
+
+  /* ---------- Hệ "tone" theo môn học / khối lớp ---------- */
+  .tone-surface {
+    background: hsl(var(--tone-hue) var(--tone-sat) 97%);
+    border-color: hsl(var(--tone-hue) 70% 90%);
+  }
+  .dark .tone-surface {
+    background: hsl(var(--tone-hue) 40% 14%);
+    border-color: hsl(var(--tone-hue) 35% 25%);
+  }
+  .tone-soft {
+    background: hsl(var(--tone-hue) var(--tone-sat) 94%);
+  }
+  .dark .tone-soft {
+    background: hsl(var(--tone-hue) 38% 18%);
+  }
+  .tone-ink {
+    color: hsl(var(--tone-hue) 68% 32%);
+  }
+  .dark .tone-ink {
+    color: hsl(var(--tone-hue) 92% 78%);
+  }
+  .tone-chip {
+    background: hsl(var(--tone-hue) 88% 92%);
+    color: hsl(var(--tone-hue) 72% 27%);
+  }
+  .dark .tone-chip {
+    background: hsl(var(--tone-hue) 42% 22%);
+    color: hsl(var(--tone-hue) 92% 84%);
+  }
+  .tone-gradient {
+    background-image: linear-gradient(
+      145deg,
+      hsl(var(--tone-hue) 82% 58%),
+      hsl(calc(var(--tone-hue) + 24) 78% 46%)
+    );
+  }
+  .tone-ring {
+    box-shadow: 0 0 0 1px hsl(var(--tone-hue) 60% 88%) inset;
+  }
+  .dark .tone-ring {
+    box-shadow: 0 0 0 1px hsl(var(--tone-hue) 40% 28%) inset;
+  }
+
+  /* ---------- Chữ ---------- */
+  .text-display {
+    font-size: var(--text-display);
+    line-height: 1.06;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+  .text-eyebrow {
+    font-size: var(--text-eyebrow);
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .text-balance-tight {
+    text-wrap: balance;
+  }
+
+  /* ---------- Bố cục ---------- */
+  .section-shell {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 80rem;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 640px) {
+    .section-shell {
+      padding-inline: 1.5rem;
+    }
+  }
+  .section-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    padding-block: 1.5rem 2.5rem;
+  }
+  @media (min-width: 768px) {
+    .section-stack {
+      gap: 4rem;
+      padding-block: 2rem 4rem;
+    }
+  }
+
+  /* ---------- Khung xanh & phấn (educational content) ---------- */
+  .chalkboard {
+    background:
+      radial-gradient(120% 90% at 12% 8%, rgb(255 255 255 / 0.09), transparent 60%),
+      linear-gradient(160deg, var(--color-board-800), var(--color-board-900));
+    border: 1px solid color-mix(in oklab, var(--color-board-700) 70%, black);
+    border-radius: var(--radius-card);
+    color: var(--color-chalk);
+  }
+  .chalkboard-grid {
+    background-image:
+      linear-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  /* ---------- Bảng dữ liệu quản trị ---------- */
+  .data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.875rem;
+  }
+  .data-table thead th {
+    background: var(--surface-muted);
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 0.7rem 1rem;
+    white-space: nowrap;
+  }
+  .data-table tbody td {
+    padding: 0.85rem 1rem;
+    border-top: 1px solid var(--border-subtle);
+    vertical-align: middle;
+  }
+  .data-table tbody tr:hover {
+    background: var(--surface-muted);
+  }
+
+  /* ---------- Skeleton ---------- */
   .skeleton {
     background: linear-gradient(
       90deg,
@@ -110,6 +313,21 @@
     );
     background-size: 200% 100%;
     animation: shimmer 1.4s ease-in-out infinite;
+  }
+
+  /* ---------- Hiệu ứng xuất hiện ---------- */
+  .rise-in {
+    animation: rise-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .rise-in-slow {
+    animation: rise-in 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .float-slow {
+    animation: float-slow 7s ease-in-out infinite;
+  }
+  .float-slower {
+    animation: float-slow 9.5s ease-in-out infinite;
+    animation-delay: -1.6s;
   }
 }
 
@@ -130,6 +348,27 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
   }
 }
 

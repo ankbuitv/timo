@@ -68,6 +68,7 @@ export default function GradesAdminPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        eyebrow="Quản trị"
         title="Lớp học"
         description="Chương trình GDPT 2018: lớp 1–12 theo ba cấp Tiểu học, THCS và THPT."
         actions={
@@ -86,41 +87,31 @@ export default function GradesAdminPage() {
       {list.data && list.data.length > 0 && (
         <AdminCard>
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="data-table">
               <caption className="sr-only">Danh sách lớp học</caption>
-              <thead className="bg-[var(--surface-muted)] text-xs uppercase tracking-wide text-[var(--text-muted)]">
+              <thead>
                 <tr>
-                  <th scope="col" className="px-4 py-3">
-                    Lớp
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Slug
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Cấp học
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Trạng thái
-                  </th>
-                  <th scope="col" className="px-4 py-3 text-right">
+                  <th scope="col">Lớp</th>
+                  <th scope="col">Slug</th>
+                  <th scope="col">Cấp học</th>
+                  <th scope="col">Trạng thái</th>
+                  <th scope="col" className="text-right">
                     Thao tác
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--border-subtle)]">
+              <tbody>
                 {list.data.map((g) => (
                   <tr key={g.id}>
-                    <td className="px-4 py-3 font-semibold text-[var(--text-strong)]">
-                      {g.nameVi}
-                    </td>
-                    <td className="px-4 py-3 font-mono text-xs">{g.slug}</td>
-                    <td className="px-4 py-3">{STAGE_LABEL[g.stage]}</td>
-                    <td className="px-4 py-3">
+                    <td className="font-semibold text-[var(--text-strong)]">{g.nameVi}</td>
+                    <td className="font-mono text-xs">{g.slug}</td>
+                    <td>{STAGE_LABEL[g.stage]}</td>
+                    <td>
                       <Badge tone={g.isActive ? "success" : "neutral"}>
                         {g.isActive ? "Đang mở" : "Đã ẩn"}
                       </Badge>
                     </td>
-                    <td className="px-4 py-3">
+                    <td>
                       {canManage && (
                         <div className="flex justify-end gap-2">
                           <Button
