@@ -88,3 +88,23 @@ Ghi chú: mọi thao tác ghi đều chịu rate limit binding `SENSITIVE_RATE_L
   "Gửi thử" cần chạy trên staging với khóa thật để xác minh.
 - Giới hạn theo ngày đếm theo UTC; chưa có giới hạn theo phút (sẽ thêm khi có nhu cầu thực tế).
 - Số liệu usage là do TIMO đếm, không phải số liệu của nhà cung cấp; đối chiếu với trang Ollama khi cần.
+
+## 7. Checklist kiểm tra thủ công trên trình duyệt
+
+Sandbox không có trình duyệt nên các bước sau **chưa được xác minh thị giác** – cần người vận hành
+kiểm tra trên staging:
+
+1. Đăng nhập bằng tài khoản super_admin (đã bootstrap) → menu trái có mục **Khóa AI**.
+   Với tài khoản chỉ có vai trò `admin` hoặc `teacher`, mục này **không** hiển thị; mở trực tiếp
+   `/admin/ai` phải bị chặn.
+2. Đặt `TIMO_AI_ENCRYPTION_KEY` (mục 2) rồi tải lại trang: cảnh báo vàng "Chưa đặt
+   TIMO_AI_ENCRYPTION_KEY" phải biến mất.
+3. Thêm khóa với khóa API thật của Ollama → bảng hiện `••••••••XXXX` đúng 4 ký tự cuối.
+   Kiểm tra D1: `SELECT secret_ciphertext FROM ai_api_keys` không chứa khóa gốc.
+4. Bấm **Kiểm tra**: có thông báo thành công kèm số model; cột "Model khả dụng" hiện danh sách.
+5. Bấm **Gửi thử** với khóa thật → có phản hồi và thời gian; sau đó số liệu "Sử dụng 14 ngày" tăng.
+6. Tắt khóa rồi **Gửi thử** → nút bị vô hiệu hóa (khóa đang tắt không được gọi).
+7. Xoay khóa bằng một khóa sai → **Kiểm tra** phải báo lỗi 401/403 và cột trạng thái chuyển "Lỗi".
+8. Kiểm tra dark mode và màn hình 375px: bảng có thanh cuộn ngang, không vỡ bố cục.
+9. Trang chủ: hero hiển thị minh họa bên phải ở màn hình ≥1024px, ẩn ở màn hình nhỏ; biểu trưng mới
+   hiển thị ở header, footer và favicon.
