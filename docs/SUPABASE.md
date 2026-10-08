@@ -8,19 +8,23 @@
 
 ## 2. Biến môi trường
 
-| Biến                        | Nơi đặt                           | Bí mật?                         |
-| --------------------------- | --------------------------------- | ------------------------------- |
-| `VITE_SUPABASE_URL`         | `apps/web/.env.local` / build env | Không                           |
-| `VITE_SUPABASE_ANON_KEY`    | `apps/web/.env.local` / build env | Không (công khai theo thiết kế) |
-| `SUPABASE_URL`              | Worker `vars` (không bí mật)      | Không                           |
-| `SUPABASE_SERVICE_ROLE_KEY` | `wrangler secret put`             | **Có**                          |
+| Biến                        | Nơi đặt                                     | Bí mật?                                    |
+| --------------------------- | ------------------------------------------- | ------------------------------------------ |
+| `VITE_SUPABASE_URL`         | `apps/web/.env.local` / build env           | Không                                      |
+| `VITE_SUPABASE_ANON_KEY`    | `apps/web/.env.local` / build env           | Không (công khai theo thiết kế)            |
+| `SUPABASE_URL`              | Worker `vars` (không bí mật)                | Không                                      |
+| `SUPABASE_ANON_KEY`         | Worker: `wrangler secret put` (khuyến nghị) | Không (công khai nhưng không đưa vào repo) |
+| `SUPABASE_SERVICE_ROLE_KEY` | **Chưa dùng.** Không đặt.                   | **Có**                                     |
+
+Worker cần `SUPABASE_ANON_KEY` để bước khởi tạo quản trị gọi `GET {SUPABASE_URL}/auth/v1/user` xác minh email đã xác nhận và trạng thái khóa. Thiếu biến này thì bootstrap trả 503.
 
 ## 3. Auth
 
 - **Authentication → URL Configuration:** Site URL = `PUBLIC_APP_URL` (ví dụ `https://timovn.dpdns.org`). Redirect URLs: thêm `…/dang-nhap` và `http://localhost:5173/dang-nhap` (phát triển).
-- **Email:** bật email/password. Bật xác nhận email trong production.
+- **Email:** bật email/password. **Bắt buộc bật xác nhận email** trong staging/production: bước khởi tạo quản trị từ chối tài khoản có `email_confirmed_at` rỗng.
 - **Providers:** bật Google / Facebook / Microsoft (Azure) khi có Client ID/Secret của chính bạn. Callback URL do Supabase cung cấp. **Chưa kiểm thử thực tế.**
-- **JWT:** API xác minh bằng JWKS, không cần JWT secret. Nếu project dùng khóa đối xứng cũ, cần cập nhật `packages/auth` (hiện chỉ hỗ trợ RS256/ES256/EdDSA).
+- **JWT:** API xác minh bằng JWKS, không cần JWT secret. Chỉ chấp nhận RS256/ES256/EdDSA (không HS256, không `none`), yêu cầu `exp`, `iat`, `sub`, `iss`, `aud=authenticated`, `role=authenticated`. Nếu project dùng khóa đối xứng cũ, cần cập nhật `packages/auth`.
+- **Giới hạn đã biết:** access token đã cấp vẫn hợp lệ đến khi hết hạn (mặc định ~1 giờ) ngay cả khi tài khoản bị khóa trên Supabase. API chặn ngay nếu hồ sơ local ở trạng thái `suspended`/`deleted`; việc khóa trên Supabase chỉ được kiểm tra tại bước khởi tạo quản trị. Khi cần khóa khẩn cấp, hãy đặt trạng thái hồ sơ local = `suspended` và thu hồi phiên trong Supabase Dashboard.
 - Kiểm tra JWKS mở được: `https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json`.
 
 ## 4. Storage (chưa tích hợp vào code)
@@ -43,7 +47,16 @@ Hệ quả: video dài không nên lưu trên Supabase Storage gói Free (dùng 
 - Tối đa 2 project đang hoạt động trên gói Free.
 - Không có backup tự động/PITR trên gói Free (xem BACKUP.md).
 
-## 6. Kiểm tra nhanh
+## 6. Checklist thủ công (chạy với project thật, chưa thực hiện)
+
+1. Tạo project staging riêng (không dùng chung với production).
+2. Bật email/password + xác nhận email; đăng ký một tài khoản thử, xác nhận qua email.
+3. Kiểm tra JWKS mở được (lệnh bên dưới).
+4. Đặt `SUPABASE_URL`, `SUPABASE_ANON_KEY` (secret), `INITIAL_ADMIN_EMAIL` đúng email đã xác nhận.
+5. Gọi `POST /api/setup/bootstrap` với token của tài khoản đó + `setupSecret` → kỳ vọng 201; lần 2 → 409.
+6. Kiểm tra `docs/SECURITY.md` mục bootstrap và xem bảng `audit_logs` có `bootstrap.completed` hoặc `bootstrap.denied`.
+
+## 7. Kiểm tra nhanh
 
 ```bash
 curl -s https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json | head -c 200

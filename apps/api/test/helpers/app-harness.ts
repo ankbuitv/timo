@@ -15,6 +15,11 @@ export interface TestUser {
   token: string;
 }
 
+export interface RemoteUserState {
+  emailConfirmedAt: string | null;
+  bannedUntil: string | null;
+}
+
 /** Tạo môi trường kiểm thử: D1 giả lập (migration thật), xác thực JWT thật (khóa cục bộ). */
 export async function createTestHarness() {
   const d1 = new FakeD1();
@@ -28,10 +33,32 @@ export async function createTestHarness() {
     { jwks: [jwk] },
   );
 
+  /** Trạng thái người dùng "phía Supabase" mô phỏng cho GET /auth/v1/user. */
+  const remoteByToken = new Map<string, { id: string; email: string } & RemoteUserState>();
+  const supabaseFetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = String(input);
+    const auth = new Headers(init?.headers).get("Authorization") ?? "";
+    const token = auth.replace(/^Bearer /, "");
+    const remote = remoteByToken.get(token);
+    if (!url.endsWith("/auth/v1/user") || !remote) {
+      return new Response(JSON.stringify({ message: "invalid" }), { status: 401 });
+    }
+    return new Response(
+      JSON.stringify({
+        id: remote.id,
+        email: remote.email,
+        email_confirmed_at: remote.emailConfirmedAt,
+        banned_until: remote.bannedUntil,
+      }),
+      { status: 200, headers: { "Content-Type": "application/json" } },
+    );
+  }) as typeof fetch;
+
   const env: Env = {
     DB: d1 as unknown as D1Database,
     APP_ENV: "development",
     SUPABASE_URL,
+    SUPABASE_ANON_KEY: "test-anon-key",
     ALLOWED_ORIGINS: "https://timovn.test",
     INITIAL_ADMIN_EMAIL: ADMIN_EMAIL,
     SETUP_SECRET,
@@ -39,10 +66,20 @@ export async function createTestHarness() {
 
   const app = createApp({
     verifier,
+    supabaseFetch,
     createDb: (e) => createDb(e),
   });
 
-  async function makeUser(email: string, id: string): Promise<TestUser> {
+  async function makeUser(
+    email: string,
+    id: string,
+    remote: Partial<RemoteUserState> = {},
+  ): Promise<TestUser> {
+    const state: RemoteUserState = {
+      emailConfirmedAt: "2026-01-01T00:00:00Z",
+      bannedUntil: null,
+      ...remote,
+    };
     const token = await new SignJWT({ sub: id, email, role: "authenticated" })
       .setProtectedHeader({ alg: "ES256", kid: "test-key" })
       .setIssuer(`${SUPABASE_URL}/auth/v1`)
@@ -50,6 +87,7 @@ export async function createTestHarness() {
       .setIssuedAt()
       .setExpirationTime("10m")
       .sign(privateKey);
+    remoteByToken.set(token, { id, email, ...state });
     return { id, email, token };
   }
 
@@ -73,6 +111,7 @@ export async function createTestHarness() {
     d1,
     request,
     makeUser,
+    supabaseFetch,
     verifiedUser: (id: string, email: string): VerifiedUser => ({
       id,
       email,

@@ -34,6 +34,9 @@ jobs:
       - name: Cài đặt phụ thuộc
         run: pnpm install --frozen-lockfile
 
+      - name: Manifest migration (migration đã áp dụng không được sửa)
+        run: node infrastructure/scripts/migration-manifest.mjs --check
+
       - name: Typecheck
         run: pnpm run typecheck
 

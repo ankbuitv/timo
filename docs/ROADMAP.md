@@ -94,3 +94,9 @@ Trạng thái ghi theo **những gì đã kiểm chứng trong repo**, không th
 2. Deploy staging, kiểm tra health, ghi lại URL thật.
 3. Thêm Playwright E2E cho: trang chủ, đăng nhập, bootstrap, CRUD lớp/môn, sắp xếp CMS.
 4. Bắt đầu Giai đoạn 3 (khóa học) với schema và seed dữ liệu demo được gắn nhãn rõ ràng.
+
+## Rà soát trước triển khai (2026-10-08)
+
+- Đã xong trong code (có test): fail-closed rate limit; cổng cấu hình; JWT chặt hơn; bootstrap xác minh email/khóa qua Supabase, atomic, có audit; manifest migration; migrate tách khỏi deploy; guard cấu hình đã đọc được `wrangler.jsonc`.
+- Chưa làm: tất cả việc cần tài khoản Cloudflare/Supabase/GitHub của chủ sở hữu (D1 id, secrets, environments, hostname). Xem `docs/PRE_DEPLOY_REVIEW.md` mục 3–6.
+- Chưa bắt đầu Phase 3 cho đến khi chủ sở hữu xác nhận rà soát.

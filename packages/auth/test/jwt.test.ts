@@ -66,4 +66,34 @@ describe("createSupabaseJwtVerifier", () => {
       .sign(other.privateKey);
     await expect(verifier.verify(token)).rejects.toMatchObject({ reason: "invalid_token" });
   });
+
+  it("rejects anon-role tokens (not a user session)", async () => {
+    const { verifier, sign } = await setup();
+    const token = await sign({ sub: USER_ID, role: "anon" });
+    await expect(verifier.verify(token)).rejects.toMatchObject({ reason: "invalid_token" });
+  });
+
+  it("rejects tokens without an expiry claim", async () => {
+    const { verifier } = await setup();
+    const { privateKey } = await generateKeyPair("ES256", { extractable: true });
+    const token = await new SignJWT({ sub: USER_ID, role: "authenticated" })
+      .setProtectedHeader({ alg: "ES256", kid: "k1" })
+      .setIssuer(`${SUPABASE_URL}/auth/v1`)
+      .setAudience("authenticated")
+      .setIssuedAt()
+      .sign(privateKey);
+    await expect(verifier.verify(token)).rejects.toBeInstanceOf(AuthError);
+  });
+
+  it("rejects HS256 tokens (algorithm confusion)", async () => {
+    const { verifier } = await setup();
+    const secret = new TextEncoder().encode("a".repeat(64));
+    const token = await new SignJWT({ sub: USER_ID, role: "authenticated" })
+      .setProtectedHeader({ alg: "HS256", kid: "k1" })
+      .setIssuer(`${SUPABASE_URL}/auth/v1`)
+      .setAudience("authenticated")
+      .setExpirationTime("5m")
+      .sign(secret);
+    await expect(verifier.verify(token)).rejects.toMatchObject({ reason: "invalid_token" });
+  });
 });

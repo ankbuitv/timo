@@ -1,8 +1,9 @@
+import { validateConfig } from "./config.js";
 import { Hono } from "hono";
 import type { SupabaseJwtVerifier } from "@timo/auth";
 import type { Env } from "./env.js";
 import { createDb } from "./lib/db.js";
-import { ApiError } from "./lib/errors.js";
+import { ApiError, errors } from "./lib/errors.js";
 import { log } from "./lib/logger.js";
 import { corsForAllowedOrigins, originGuard, securityHeaders } from "./middleware/security.js";
 import type { AppBindings, AppVariables } from "./middleware/auth.js";
@@ -15,6 +16,8 @@ import { newId } from "./lib/db.js";
 export interface AppOptions {
   /** Ghi đè bộ xác thực (dùng khi kiểm thử). */
   verifier?: SupabaseJwtVerifier;
+  /** Ghi đè fetch tới Supabase (dùng khi kiểm thử). */
+  supabaseFetch?: typeof fetch;
   /** Ghi đè cách tạo DB (dùng khi kiểm thử). */
   createDb?: (env: Env) => AppVariables["db"];
 }
@@ -29,6 +32,7 @@ export function createApp(options: AppOptions = {}) {
     c.set("requestId", requestId);
     c.set("db", (options.createDb ?? createDb)(c.env));
     if (options.verifier) c.set("verifier", options.verifier);
+    if (options.supabaseFetch) c.set("supabaseFetch", options.supabaseFetch);
     c.header("X-Request-Id", requestId);
     const started = Date.now();
     await next();
@@ -44,15 +48,30 @@ export function createApp(options: AppOptions = {}) {
   app.use("/api/*", corsForAllowedOrigins);
   app.use("/api/*", originGuard);
 
-  app.get("/api/health", (c) =>
-    c.json({
+  // Cổng cấu hình: staging/production thiếu cấu hình bắt buộc → 503 (không phục vụ dữ liệu).
+  // Chỉ ghi TÊN biến vào log, không ghi giá trị.
+  app.use("/api/*", async (c, next) => {
+    if (c.req.path === "/api/health") return next();
+    if ((c.env.APP_ENV ?? "development") === "development") return next();
+    const problems = validateConfig(c.env);
+    if (problems.length > 0) {
+      log("error", "config.invalid", { names: problems.map((p) => p.name) });
+      throw errors.unavailable("Hệ thống chưa được cấu hình đầy đủ");
+    }
+    return next();
+  });
+
+  app.get("/api/health", (c) => {
+    const environment = c.env.APP_ENV ?? "development";
+    return c.json({
       status: "ok",
       service: "timo-api",
       version: APP_VERSION,
-      environment: c.env.APP_ENV ?? "development",
+      environment,
+      configured: environment === "development" ? true : validateConfig(c.env).length === 0,
       time: new Date().toISOString(),
-    }),
-  );
+    });
+  });
 
   app.route("/api/public", publicRoutes);
   app.route("/api/me", meRoutes);

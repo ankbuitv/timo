@@ -29,6 +29,7 @@ export type AppVariables = {
   db: Db;
   auth?: AuthContext;
   verifier?: SupabaseJwtVerifier;
+  supabaseFetch?: typeof fetch;
   requestId: string;
 };
 
@@ -82,6 +83,14 @@ export async function loadOrProvisionUser(db: Db, user: VerifiedUser): Promise<A
     profile = await db.select().from(s.profiles).where(eq(s.profiles.id, user.id)).get();
   }
   if (!profile) throw errors.unavailable("Không thể tải hồ sơ người dùng");
+  // Đồng bộ email nếu người dùng đã đổi email trên Supabase (email là khóa duy nhất).
+  if (existing && user.email && existing.email !== user.email) {
+    await db
+      .update(s.profiles)
+      .set({ email: user.email, updatedAt: now() })
+      .where(eq(s.profiles.id, user.id));
+    profile = { ...profile, email: user.email };
+  }
 
   const roleRows = await db
     .select({ key: s.roles.key })

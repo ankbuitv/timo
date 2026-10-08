@@ -62,6 +62,7 @@ export function createSupabaseJwtVerifier(
           audience,
           algorithms: ["RS256", "ES256", "EdDSA"],
           clockTolerance: 5,
+          requiredClaims: ["exp", "iat", "sub", "iss", "aud"],
         });
         payload = result.payload;
       } catch (err) {
@@ -73,6 +74,10 @@ export function createSupabaseJwtVerifier(
       const sub = typeof payload.sub === "string" ? payload.sub : "";
       if (!/^[0-9a-f-]{36}$/i.test(sub)) {
         throw new AuthError("invalid_token", "Token thiếu định danh người dùng hợp lệ");
+      }
+      // Chỉ người dùng đã đăng nhập mới được chấp nhận; token anon/service không mang vai trò này.
+      if (payload.role !== "authenticated") {
+        throw new AuthError("invalid_token", "Token không thuộc phiên người dùng");
       }
       const email = typeof payload.email === "string" ? payload.email.toLowerCase() : null;
       const role = typeof payload.role === "string" ? payload.role : null;

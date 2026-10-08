@@ -1,4 +1,8 @@
 # Sao chép thành apps/api/.dev.vars (đã git ignore). KHÔNG commit file thật.
+# Môi trường phát triển cục bộ. Staging/production dùng `wrangler secret put` và wrangler.jsonc.
+APP_ENV=development
+ALLOWED_ORIGINS=http://localhost:5173
 SUPABASE_URL=https://<project-ref>.supabase.co
+SUPABASE_ANON_KEY=<khóa-anon-công-khai>
 SETUP_SECRET=<chuỗi-ngẫu-nhiên-ít-nhất-32-ký-tự>
 INITIAL_ADMIN_EMAIL=<email-quản-trị-viên-đầu-tiên>

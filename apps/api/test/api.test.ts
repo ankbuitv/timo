@@ -154,6 +154,51 @@ describe("TIMO API", () => {
       expect(res.status).toBe(403);
     });
 
+    it("refuses the initial admin when Supabase reports the email is not verified", async () => {
+      const unverified = await h.makeUser(ADMIN_EMAIL, "44444444-4444-4444-8444-444444444444", {
+        emailConfirmedAt: null,
+      });
+      const res = await h.request("/api/setup/bootstrap", {
+        method: "POST",
+        token: unverified.token,
+        json: { setupSecret: SETUP_SECRET },
+      });
+      expect(res.status).toBe(403);
+      const logs = await h.request("/api/admin/audit-logs", { token: admin.token });
+      expect(logs.status).toBe(403);
+      const rows = h.d1.sqlite.prepare("SELECT action, metadata FROM audit_logs").all() as Record<
+        string,
+        unknown
+      >[];
+      expect(rows.map((r) => r.action)).toContain("bootstrap.denied");
+      expect(rows.some((r) => String(r.metadata).includes("email_not_verified"))).toBe(true);
+    });
+
+    it("refuses a banned initial admin", async () => {
+      const banned = await h.makeUser(ADMIN_EMAIL, "55555555-5555-4555-8555-555555555555", {
+        bannedUntil: "2099-01-01T00:00:00Z",
+      });
+      const res = await h.request("/api/setup/bootstrap", {
+        method: "POST",
+        token: banned.token,
+        json: { setupSecret: SETUP_SECRET },
+      });
+      expect(res.status).toBe(403);
+    });
+
+    it("does not leak the setup secret into audit logs", async () => {
+      await h.request("/api/setup/bootstrap", {
+        method: "POST",
+        token: admin.token,
+        json: { setupSecret: "wrong-secret-value-that-is-long-enough" },
+      });
+      const rows = h.d1.sqlite.prepare("SELECT metadata FROM audit_logs").all() as Record<
+        string,
+        unknown
+      >[];
+      expect(JSON.stringify(rows)).not.toContain("wrong-secret-value");
+    });
+
     it("grants super_admin once, records the operation, and refuses a second run", async () => {
       const first = await h.request("/api/setup/bootstrap", {
         method: "POST",

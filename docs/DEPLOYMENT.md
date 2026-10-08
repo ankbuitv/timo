@@ -45,11 +45,13 @@ pnpm run check
 
 GitHub → Actions → **Deploy** → `environment: staging`. Workflow sẽ:
 
-1. Kiểm tra cấu hình (chặn nếu placeholder).
-2. Build.
-3. Áp dụng migration từ xa.
-4. Deploy Worker.
+1. Kiểm tra CI đã xanh trên đúng commit (GitHub API `head_sha`).
+2. Kiểm tra cấu hình (chặn placeholder, https, rate limit binding) và manifest migration.
+3. Chặn nếu còn migration chưa áp dụng (`wrangler d1 migrations list --remote`).
+4. Build và deploy Worker.
 5. Health check `/api/health`.
+
+**Deploy KHÔNG tự áp dụng migration.** Migration chạy riêng bằng workflow **Migrate D1 (thủ công)** (`migrate.yml`): chọn môi trường, gõ đúng `MIGRATE-staging` hoặc `MIGRATE-production`, và GitHub Environment yêu cầu reviewer phê duyệt. Thứ tự: Migrate → Deploy.
 
 Sau đó: đăng nhập, khởi tạo quản trị, kiểm tra các màn hình quản trị.
 
@@ -64,6 +66,8 @@ Chỉ sau khi staging đạt. Chạy workflow với `environment: production` v�
 - **Web:** deploy lại artifact của commit trước.
 
 ## Không deploy khi
+
+- Chưa chạy workflow Migrate cho môi trường đó (deploy sẽ tự chặn).
 
 - CI không xanh (workflow `ci.yml` là điều kiện).
 - Cấu hình còn placeholder.
